@@ -19,6 +19,8 @@ import { query } from './query.js';
     .argument('[string]', 'Path to target')
     .action((options)=> {
       // if stdin
+      // // if stdin and source path
+      // // // exception stdin source path
       // // if source type is biorg
       // // // parse biorg
       // // // stream entries -->
@@ -29,13 +31,32 @@ import { query } from './query.js';
       // // // write metadir to temporary dir
       // // // query temporary dir
       // // // stream entries -->
-      // if source path is directory
-      // // if source type is not csvs
+      // TODO: if no stdin and no source path
+      // // // TODO: if source type is fs
+      // // // read path from .git
+      // // // // exception no file path in .git
+      // // // list file paths as stream -->
+      // // // --> stream stat of files -->
+      // // // --> stream entries -->
+      // // // if source type is csvs
+      // // // list file paths as stream -->
+      // // // --> stream stat of files -->
+      // // // --> stream entries -->
+      // // // if source type is biorg
+      // // // // exception no biorg input
+      // // // if source type is json
+      // // // // exception no json input
+      // TODO: if source path is directory
+      // // if source type is not csvs or fs
       // // // exception source type
       // // if source type is csvs
       // // // run -q or empty search query
       // // // if --gc optimize
       // // // stream entries -->
+      // // TODO: if source type is fs
+      // // // list file paths as stream -->
+      // // // --> stream stat of files -->
+      // // // --> stream entries -->
       // if source path is bi.org
       // // if source type is not biorg
       // // // exception source type
@@ -49,26 +70,34 @@ import { query } from './query.js';
       // // // parse json
       // // // stream entries -->
       //
-      // if no target source
+      // // TODO: map source and target schemas
+      // // transform
+      //
+      // if no target type
       // // if no target path
       // // // --> stream json -->
       // // if target path is directory
       // // // --> stream json
       // // if target path is file
       // // // --> stream biorg -->
-      // if target source is biorg
+      // if target type is biorg
       // // --> stream biorg -->
-      // if target source is json
+      // if target type is json
+      // // --> stream json -->
+      // TODO: if target type is csvs
       // // --> stream json -->
       //
       // if no target path
       // // --> output to stdin
       // if target path is file
       // // --> append entries to file
-      // if target path is directory
+      // TODO: if target path is directory
       // // if target directory is not metadir
       // // // exception not metadir
-      // // --> write entries to metadir
+      // // if target directory is metadir
+      // // TODO: --> write entries to metadir
+      // // // if source path is csvs
+      // // // // copy binary blobs from source asset endpoint to target
     });
 
   program.parse();
