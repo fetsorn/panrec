@@ -72,5 +72,4 @@ export async function query(query, options) {
   } catch(e) {
     console.log(e)
   }
-
 }
