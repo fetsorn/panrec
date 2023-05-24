@@ -3,6 +3,123 @@ import { Command } from 'commander';
 import { packageJSON } from './utils/packageJson.js';
 import { query } from './query.js';
 
+function readBiorg(chunk, query) {
+  // parse biorg
+  // match entry to query
+  // stream entries -->
+}
+
+function readJson(chunk, query) {
+  // parse json
+  // match entry to query
+  // stream entries -->
+}
+
+function writeTmpMetadir(chunk) {
+  // write metadir to temporary dir
+}
+
+// @returns {Stream}
+function readCSVS(path, query) {
+  // query
+  // stream entries -->
+  // run -q or empty search query
+  // --> stream entries -->
+}
+
+// @returns {Stream}
+function readFS(path) {
+  // list file paths as stream -->
+  // --> stream stat of files -->
+  // --> stream entries -->
+}
+
+// @param {string} sourcePath - Path to source
+// @param {string} query - Query string
+// @returns {Stream}
+function readStream(sourcePath, query) {
+  // if stdin
+  // // if stdin and source path
+  // // // exception stdin source path
+  // // if source type is biorg
+  // // // pipe stdin stream to parseBiorg
+  // // if source type is json
+  // // // pipe stdin stream to parseJson
+  // // if source type is csvs metadir stream
+  // // // pipe stdin stream to writeTmpMetadir
+  // // // return readMetadir stream on temporary metadir
+
+  // if no stdin and no source path or source path is directory
+  // // // detect source type is csvs
+  // // // // return readMetadir stream on sourcePath
+  // // // otherwise source type is fs
+  // // // // return readFS stream on sourcePath
+
+  // if source path is bi.org
+  // // detect source type is biorg
+  // // // read sourcePath as stream
+  // // // pipe contents stream to parseBiorg
+
+  // if source path is .json
+  // // detect source type is json
+  // // // read sourcePath as stream
+  // // // pipe contents stream to parseJson
+}
+
+function gcStream(gc) {
+  // if --gc optimize
+  // if gc is true, transform stream with gc
+  // otherwise pass pass through
+  return Passthrough();
+}
+
+function mapStream() {
+  // map source and target schemas
+  // transform
+}
+
+// builds json array string from json objects
+// @returns stream
+function buildJson(entry) {
+
+}
+
+function buildBiorg(entry) {
+
+}
+
+function buildCSVS(entry) {
+  // --> write entries to metadir
+  // // if source path is csvs
+  // // // copy binary blobs from source asset endpoint to target
+}
+
+function writeStdin(chunk) {
+  // // --> output to stdin
+}
+
+function writeFile(filepath, chunk) {
+  // // --> output to file
+}
+
+function buildStream(targetPath, targetType, entry) {
+
+  // if target type is csvs or target path is directory
+  // // if target path not directory
+  // // // exception metadir no dir
+  // // pass entry to buildCSVS stream, return
+
+  // if no target type or target type is json
+  // // pass json entry to buildJson
+  // if target type is biorg
+  // // pass json entry to buildBiorg stream
+
+  // if no target path
+  // // pass string chunk to writeStdin stream
+  // if target path is file
+  // // pass string chunk to writeFile stream
+}
+
 (async () => {
   const program = new Command();
 
@@ -11,93 +128,19 @@ import { query } from './query.js';
     .description('Manage csvs databases.')
     .version(packageJSON.version, '-v, --version')
     .option('-i, --source-path <string>', 'Path to source')
-    .option('-s, --source-type <string>', 'Type of source')
-    // .option('--source-schema <string>', 'Path to source schema')
+    .option('-o, --target-path <string>', 'Path to target')
     .option('-t, --target-type <string>', 'Type of target')
-    // .option('--target-schema <string>', 'Path to target schema')
-    .option('-q, ---query <string>', 'Search string')
-    .argument('[string]', 'Path to target')
+    .option('-q, --query <string>', 'Search string')
+    .option('--gc', 'Collect dangling database nodes')
     .action((options)=> {
-      // if stdin
-      // // if stdin and source path
-      // // // exception stdin source path
-      // // if source type is biorg
-      // // // parse biorg
-      // // // stream entries -->
-      // // if source type is json
-      // // // parse json
-      // // // stream entries -->
-      // // if source type is csvs metadir stream
-      // // // write metadir to temporary dir
-      // // // query temporary dir
-      // // // stream entries -->
-      // TODO: if no stdin and no source path
-      // // // TODO: if source type is fs
-      // // // read path from .git
-      // // // // exception no file path in .git
-      // // // list file paths as stream -->
-      // // // --> stream stat of files -->
-      // // // --> stream entries -->
-      // // // if source type is csvs
-      // // // list file paths as stream -->
-      // // // --> stream stat of files -->
-      // // // --> stream entries -->
-      // // // if source type is biorg
-      // // // // exception no biorg input
-      // // // if source type is json
-      // // // // exception no json input
-      // TODO: if source path is directory
-      // // if source type is not csvs or fs
-      // // // exception source type
-      // // if source type is csvs
-      // // // run -q or empty search query
-      // // // if --gc optimize
-      // // // stream entries -->
-      // // TODO: if source type is fs
-      // // // list file paths as stream -->
-      // // // --> stream stat of files -->
-      // // // --> stream entries -->
-      // if source path is bi.org
-      // // if source type is not biorg
-      // // // exception source type
-      // // if source type is biorg
-      // // // parse biorg
-      // // // stream entries -->
-      // if source path is .json
-      // // if source type is not json
-      // // // exception source type
-      // // if source type is json
-      // // // parse json
-      // // // stream entries -->
-      //
-      // // TODO: map source and target schemas
-      // // transform
-      //
-      // if no target type
-      // // if no target path
-      // // // --> stream json -->
-      // // if target path is directory
-      // // // --> stream json
-      // // if target path is file
-      // // // --> stream biorg -->
-      // if target type is biorg
-      // // --> stream biorg -->
-      // if target type is json
-      // // --> stream json -->
-      // TODO: if target type is csvs
-      // // --> stream json -->
-      //
-      // if no target path
-      // // --> output to stdin
-      // if target path is file
-      // // --> append entries to file
-      // TODO: if target path is directory
-      // // if target directory is not metadir
-      // // // exception not metadir
-      // // if target directory is metadir
-      // // TODO: --> write entries to metadir
-      // // // if source path is csvs
-      // // // // copy binary blobs from source asset endpoint to target
+      try {
+        await pipeline(
+          readStream(options.sourcePath, options.query),
+          // gcStream(options.gc),
+          // mapStream(),
+          writeStream(options.targetPath, options.targetType)
+        )
+      }
     });
 
   program.parse();
