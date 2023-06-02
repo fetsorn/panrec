@@ -2,6 +2,10 @@
 import { Command } from 'commander';
 import { packageJSON } from './utils/packageJson.js';
 import { query } from './query.js';
+import stream from 'stream';
+import util from 'util';
+import fs from 'fs';
+const pipeline = util.promisify(stream.pipeline);
 
 function readBiorg(chunk, query) {
   // parse biorg
@@ -38,6 +42,10 @@ function readFS(path) {
 // @param {string} query - Query string
 // @returns {Stream}
 function readStream(sourcePath, query) {
+  const toStream = new stream.Readable();
+  toStream.push(JSON.stringify({"a": "a"}))
+  toStream.push(null);
+  return toStream;
   // if stdin
   // // if stdin and source path
   // // // exception stdin source path
@@ -88,7 +96,7 @@ function buildBiorg(entry) {
 
 }
 
-function buildCSVS(entry) {
+function buildCSVS() {
   // --> write entries to metadir
   // // if source path is csvs
   // // // copy binary blobs from source asset endpoint to target
@@ -102,22 +110,37 @@ function writeFile(filepath, chunk) {
   // // --> output to file
 }
 
-function buildStream(targetPath, targetType, entry) {
+function writeStream(targetPath, targetType) {
 
   // if target type is csvs or target path is directory
   // // if target path not directory
   // // // exception metadir no dir
   // // pass entry to buildCSVS stream, return
+  // if (targetType === 'csvs' || fs.isDirectory(targetPath)) {
+  //   return buildCSVS()
+  // }
 
+  // TODO: unite with output stream
   // if no target type or target type is json
   // // pass json entry to buildJson
+  if (!targetType || targetType === 'json') {
+    // buildJson()
+  }
   // if target type is biorg
   // // pass json entry to buildBiorg stream
+  if (targetType === 'biorg') {
+    // buildBiorg()
+  }
 
   // if no target path
   // // pass string chunk to writeStdin stream
+  if (!targetPath) {
+    return process.stdout;
+  }
   // if target path is file
   // // pass string chunk to writeFile stream
+  // otherwise throw
+  return fs.createWriteStream("output.txt")
 }
 
 (async () => {
@@ -127,12 +150,12 @@ function buildStream(targetPath, targetType, entry) {
     .name(packageJSON.name)
     .description('Manage csvs databases.')
     .version(packageJSON.version, '-v, --version')
-    .option('-i, --source-path <string>', 'Path to source')
-    .option('-o, --target-path <string>', 'Path to target')
-    .option('-t, --target-type <string>', 'Type of target')
-    .option('-q, --query <string>', 'Search string')
+    .option('-i, --source-path <string>', 'Path to source') // defautls to .
+    .option('-o, --target-path <string>', 'Path to target') // defaults to undefined
+    .option('-t, --target-type <string>', 'Type of target') // defaults to "json", if targetPath is specified defaults to "csvs"
+    .option('-q, --query <string>', 'Search string') // defaults to "?"
     .option('--gc', 'Collect dangling database nodes')
-    .action((options)=> {
+    .action(async (options) => {
       try {
         await pipeline(
           readStream(options.sourcePath, options.query),
@@ -140,6 +163,8 @@ function buildStream(targetPath, targetType, entry) {
           // mapStream(),
           writeStream(options.targetPath, options.targetType)
         )
+      } catch {
+
       }
     });
 
