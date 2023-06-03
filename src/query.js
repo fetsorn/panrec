@@ -73,3 +73,12 @@ export async function query(query, options) {
     console.log(e)
   }
 }
+
+// @returns {Stream}
+function queryStream(path, query) {
+  // TODO:
+  // query
+  // stream entries -->
+  // run -q or empty search query
+  // --> stream entries -->
+}

@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 import { Command } from 'commander';
 import { packageJSON } from './utils/packageJson.js';
-import { query } from './query.js';
+import { queryStream } from './query.js';
 import stream from 'stream';
 import util from 'util';
 import fs from 'fs';
@@ -24,14 +24,6 @@ function writeTmpMetadir(chunk) {
 }
 
 // @returns {Stream}
-function readCSVS(path, query) {
-  // query
-  // stream entries -->
-  // run -q or empty search query
-  // --> stream entries -->
-}
-
-// @returns {Stream}
 function readFS(path) {
   // list file paths as stream -->
   // --> stream stat of files -->
@@ -43,6 +35,7 @@ function readFS(path) {
 // @returns {Stream}
 function readStream(sourcePath, query) {
   const toStream = new stream.Readable();
+  // TODO: stream object mode
   toStream.push(JSON.stringify({"a": "a"}))
   toStream.push(null);
   return toStream;
@@ -55,11 +48,11 @@ function readStream(sourcePath, query) {
   // // // pipe stdin stream to parseJson
   // // if source type is csvs metadir stream
   // // // pipe stdin stream to writeTmpMetadir
-  // // // return readMetadir stream on temporary metadir
+  // // // return queryStream on temporary metadir
 
   // if no stdin and no source path or source path is directory
-  // // // detect source type is csvs
-  // // // // return readMetadir stream on sourcePath
+  // // // TODO: detect source type is csvs
+  // // // // return queryStream on sourcePath
   // // // otherwise source type is fs
   // // // // return readFS stream on sourcePath
 
@@ -150,10 +143,11 @@ function writeStream(targetPath, targetType) {
     .name(packageJSON.name)
     .description('Manage csvs databases.')
     .version(packageJSON.version, '-v, --version')
-    .option('-i, --source-path <string>', 'Path to source') // defautls to .
-    .option('-o, --target-path <string>', 'Path to target') // defaults to undefined
-    .option('-t, --target-type <string>', 'Type of target') // defaults to "json", if targetPath is specified defaults to "csvs"
-    .option('-q, --query <string>', 'Search string') // defaults to "?"
+    .option('-i, --source-path <string>', 'Path to source', '.')
+    .option('-o, --target-path <string>', 'Path to target')
+    // TODO if targetPath is specified defaults to "csvs"
+    .option('-t, --target-type <string>', 'Type of target', 'json')
+    .option('-q, --query <string>', 'Search string', '?')
     .option('--gc', 'Collect dangling database nodes')
     .action(async (options) => {
       try {
