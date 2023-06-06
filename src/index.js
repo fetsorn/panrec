@@ -33,12 +33,12 @@ function readFS(path) {
 // @param {string} sourcePath - Path to source
 // @param {string} query - Query string
 // @returns {Stream}
-function readStream(sourcePath, query) {
-  const toStream = new stream.Readable();
+async function readStream(sourcePath, query) {
+   // const toStream = new stream.Readable();
   // TODO: stream object mode
-  toStream.push(JSON.stringify({"a": "a"}))
-  toStream.push(null);
-  return toStream;
+  // toStream.push(JSON.stringify({"a": "a"}))
+  // toStream.push(null);
+  // return toStream;
   // if stdin
   // // if stdin and source path
   // // // exception stdin source path
@@ -52,7 +52,7 @@ function readStream(sourcePath, query) {
 
   // if no stdin and no source path or source path is directory
   // // // TODO: detect source type is csvs
-  // // // // return queryStream on sourcePath
+  return queryStream(sourcePath, query)
   // // // otherwise source type is fs
   // // // // return readFS stream on sourcePath
 
@@ -143,7 +143,7 @@ function writeStream(targetPath, targetType) {
     .name(packageJSON.name)
     .description('Manage csvs databases.')
     .version(packageJSON.version, '-v, --version')
-    .option('-i, --source-path <string>', 'Path to source', '.')
+    .option('-i, --source-path <string>', 'Path to source', process.cwd())
     .option('-o, --target-path <string>', 'Path to target')
     // TODO if targetPath is specified defaults to "csvs"
     .option('-t, --target-type <string>', 'Type of target', 'json')
@@ -152,13 +152,13 @@ function writeStream(targetPath, targetType) {
     .action(async (options) => {
       try {
         await pipeline(
-          readStream(options.sourcePath, options.query),
+          await readStream(options.sourcePath, options.query),
           // gcStream(options.gc),
           // mapStream(),
           writeStream(options.targetPath, options.targetType)
         )
-      } catch {
-
+      } catch(e) {
+        console.log("pipeline", e)
       }
     });
 

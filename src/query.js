@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import stream from 'stream';
 import { fileURLToPath, URLSearchParams } from 'node:url';
 import { CSVS } from '@fetsorn/csvs-js';
 
@@ -43,42 +44,34 @@ async function grepCallback(contentFile, patternFile, isInverse) {
 }
 
 async function fetchCallback(filepath) {
-  const realpath = path.join(process.cwd(), filepath);
-
-  let contents;
-
   try {
-    console.log("fetchCallback", filepath, realpath);
-    contents = await fs.promises.readFile(realpath, { encoding: 'utf8' });
+    // console.log("fetchCallback", filepath);
 
-    return contents;
+    return fs.promises.readFile(filepath, { encoding: 'utf8' });
   } catch {
     throw ("couldn't find file", filepath);
   }
 }
 
-export async function query(query, options) {
+export async function queryStream(sourcePath, query) {
   const searchParams = new URLSearchParams(query);
-
-  console.log(searchParams)
 
   try {
     const overview = await (new CSVS({
-      readFile: fetchCallback,
+      readFile: async (filepath) => fetchCallback(path.join(sourcePath, filepath)),
       grep: grepCallback,
     })).select(searchParams);
 
-    console.log(overview, 2)
-  } catch(e) {
-    console.log(e)
-  }
-}
+    const toStream = new stream.Readable();
 
-// @returns {Stream}
-function queryStream(path, query) {
-  // TODO:
-  // query
-  // stream entries -->
-  // run -q or empty search query
-  // --> stream entries -->
+    for (const entry of overview) {
+      toStream.push(JSON.stringify(entry, 2))
+    }
+
+    toStream.push(null);
+
+    return toStream
+  } catch(e) {
+    console.log("queryStream", e)
+  }
 }
