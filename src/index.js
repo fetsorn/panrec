@@ -2,6 +2,7 @@
 import { Command } from 'commander';
 import { packageJSON } from './utils/packageJson.js';
 import { queryStream } from './query.js';
+import { parseVK } from './vk.js';
 import stream from 'stream';
 import util from 'util';
 import fs from 'fs';
@@ -52,9 +53,16 @@ async function readStream(sourcePath, query) {
 
   // if no stdin and no source path or source path is directory
   // // // TODO: detect source type is csvs
-  return queryStream(sourcePath, query)
+  // return queryStream(sourcePath, query)
   // // // otherwise source type is fs
   // // // // return readFS stream on sourcePath
+
+  // TODO if source path is index.html
+  // // if source type is vk
+  if (true) {
+    // // // pipe stdin stream to parseVK
+    return parseVK(sourcePath, query)
+  }
 
   // if source path is bi.org
   // // detect source type is biorg
