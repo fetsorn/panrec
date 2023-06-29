@@ -52,6 +52,8 @@ export async function parseVK(sourcePath, query) {
 
   const senders = parse(index).childNodes[1].childNodes[2].childNodes[1].childNodes[3].childNodes[1].childNodes[5].childNodes.filter((n) => n.nodeName == 'div')
 
+  var entries = []
+
   for (const sender of senders) {
     const [path, name] = parseSender(sender)
 
@@ -59,16 +61,16 @@ export async function parseVK(sourcePath, query) {
 
     const messages0 = iconv.convert(await fs.promises.readFile(messages0Path)).toString('utf8')
 
-    const messages = parse(messages0).childNodes[1].childNodes[2].childNodes[1].childNodes[3].childNodes[3].childNodes.filter((n) => n.nodeName == 'div' && n.attrs[0].value !== 'pagination clear_fix')
+    const messages = parse(messages0).childNodes[1].childNodes[2].childNodes[1].childNodes[3].childNodes[3].childNodes.filter(
+      (n) => n.nodeName == 'div' && n.attrs[0].value !== 'pagination clear_fix'
+    )
 
     for (const message of messages) {
       const [dataId, content] = parseMessage(message)
 
-      console.log(name, dataId, content)
+      entries.push({name, dataId, content})
     }
   }
-
-  const entries = []
 
   try {
     const toStream = new stream.Readable();
