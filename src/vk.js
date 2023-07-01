@@ -29,11 +29,9 @@ function parseSender(item) {
 }
 
 function parseMessage(item) {
-      // console.log(item)
+  // TODO detect if sent or received
   const message = item.childNodes[1].childNodes.filter((a) => a.nodeName == 'div')[0]
-      // console.log(message)
 
-  // console.log(item)
   const dataId = message.attrs[1].value
 
   const content = message.childNodes[3].childNodes[0].value
@@ -68,12 +66,14 @@ export async function parseVK(sourcePath, query) {
     for (const message of messages) {
       const [dataId, content] = parseMessage(message)
 
-      entries.push({name, dataId, content})
+      // TODO check that content is not undefined
+      // dataId
+      entries.push({_: "datum", datum: content, actname: name})
     }
   }
 
   try {
-    const toStream = new stream.Readable();
+    const toStream = new stream.Readable({objectMode: true});
 
     for (const entry of entries) {
       toStream.push(JSON.stringify(entry, 2))

@@ -3,8 +3,10 @@ import { Command } from 'commander';
 import { packageJSON } from './utils/packageJson.js';
 import { queryStream } from './query.js';
 import { parseVK } from './vk.js';
+import { writeCSVS } from './csvs.js';
 import stream from 'stream';
 import util from 'util';
+import path from 'path';
 import fs from 'fs';
 const pipeline = util.promisify(stream.pipeline);
 
@@ -53,13 +55,13 @@ async function readStream(sourcePath, query) {
 
   // if no stdin and no source path or source path is directory
   // // // TODO: detect source type is csvs
-  // return queryStream(sourcePath, query)
+  return queryStream(sourcePath, query)
   // // // otherwise source type is fs
   // // // // return readFS stream on sourcePath
 
   // TODO if source path is index.html
   // // if source type is vk
-  if (true) {
+  if (false) {
     // // // pipe stdin stream to parseVK
     return parseVK(sourcePath, query)
   }
@@ -90,25 +92,9 @@ function mapStream() {
 // builds json array string from json objects
 // @returns stream
 function buildJson(entry) {
-
 }
 
 function buildBiorg(entry) {
-
-}
-
-function buildCSVS() {
-  // --> write entries to metadir
-  // // if source path is csvs
-  // // // copy binary blobs from source asset endpoint to target
-}
-
-function writeStdin(chunk) {
-  // // --> output to stdin
-}
-
-function writeFile(filepath, chunk) {
-  // // --> output to file
 }
 
 function writeStream(targetPath, targetType) {
@@ -117,9 +103,11 @@ function writeStream(targetPath, targetType) {
   // // if target path not directory
   // // // exception metadir no dir
   // // pass entry to buildCSVS stream, return
-  // if (targetType === 'csvs' || fs.isDirectory(targetPath)) {
-  //   return buildCSVS()
-  // }
+  const isCSVS = targetType === 'csvs'
+        || (targetPath && fs.statSync(targetPath).isDirectory())
+  if (isCSVS) {
+    return writeCSVS(path.normalize(targetPath))
+  }
 
   // TODO: unite with output stream
   // if no target type or target type is json
@@ -133,15 +121,17 @@ function writeStream(targetPath, targetType) {
     // buildBiorg()
   }
 
+    console.log("AA")
   // if no target path
   // // pass string chunk to writeStdin stream
   if (!targetPath) {
     return process.stdout;
   }
+
   // if target path is file
   // // pass string chunk to writeFile stream
   // otherwise throw
-  return fs.createWriteStream("output.txt")
+  return fs.createWriteStream(path.normalize(targetPath))
 }
 
 (async () => {
@@ -153,7 +143,7 @@ function writeStream(targetPath, targetType) {
     .version(packageJSON.version, '-v, --version')
     .option('-i, --source-path <string>', 'Path to source', process.cwd())
     .option('-o, --target-path <string>', 'Path to target')
-    // TODO if targetPath is specified defaults to "csvs"
+    // TODO if targetPath is specified, targetType defaults to "csvs"
     .option('-t, --target-type <string>', 'Type of target', 'json')
     .option('-q, --query <string>', 'Search string', '?')
     .option('--gc', 'Collect dangling database nodes')
