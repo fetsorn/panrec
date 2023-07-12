@@ -135,14 +135,14 @@ export async function parseVK(sourcePath, query) {
 
   const senders = parse(index).childNodes[1].childNodes[2].childNodes[1].childNodes[3].childNodes[1].childNodes[5].childNodes.filter((n) => n.nodeName == 'div')
 
-  const entries = await Promise.all(senders.map(
+  const entries = (await Promise.all(senders.map(
     async (sender) => senderEntries(sourcePath, query, sender)
-  ))
+  ))).flat()
 
   try {
     const toStream = new stream.Readable({objectMode: true});
 
-    for (const entry of entries.flat()) {
+    for (const entry of entries) {
       toStream.push(JSON.stringify(entry, 2))
     }
 
