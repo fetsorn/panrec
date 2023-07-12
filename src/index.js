@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import { packageJSON } from './utils/packageJson.js';
 import { readCSVS } from './parse/csvs.js';
 import { parseVK } from './parse/vk.js';
+import { parseTG } from './parse/tg.js';
 import { writeCSVS } from './build/csvs.js';
 import stream from 'stream';
 import util from 'util';
@@ -53,6 +54,16 @@ async function isVK(sourcePath) {
   }
 }
 
+async function isTG(sourcePath) {
+  try {
+    await fs.promises.readFile(`${sourcePath}/result.json`)
+
+    return true
+  } catch {
+    return false
+  }
+}
+
 // @param {string} sourcePath - Path to source
 // @param {string} query - Query string
 // @returns {Stream}
@@ -78,8 +89,14 @@ async function readStream(sourcePath, query) {
 
   // // if source type is vk
   if (await isVK(sourcePath)) {
-    // // // pipe stdin stream to parseVK
+    // // // read filesystem with parseVK
     return parseVK(sourcePath, query)
+  }
+
+  // // if source type is tg
+  if (await isTG(sourcePath)) {
+    // // // read filesystem with parseTG
+    return parseTG(sourcePath, query)
   }
 
   // if source path is bi.org

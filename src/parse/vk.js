@@ -67,9 +67,9 @@ function parseMessage(item) {
 }
 
 function messageEntry(query, name, message) {
-  const {dataId, date, isOutcoming, content} = parseMessage(message)
+  const { dataId, date, isOutcoming, content } = parseMessage(message)
 
-  const entry = {_: "datum", datum: content, actdate: date}
+  const entry = { _: "datum", datum: content, actdate: date, category: "vk" }
 
   const nameOutcoming = "you"
 
