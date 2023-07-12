@@ -53,7 +53,7 @@ async function fetchCallback(filepath) {
   }
 }
 
-export async function queryStream(sourcePath, query) {
+export async function readCSVS(sourcePath, query) {
   const searchParams = new URLSearchParams(query);
 
   try {

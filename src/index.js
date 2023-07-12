@@ -1,9 +1,9 @@
 #! /usr/bin/env node
 import { Command } from 'commander';
 import { packageJSON } from './utils/packageJson.js';
-import { queryStream } from './query.js';
-import { parseVK } from './vk.js';
-import { writeCSVS } from './csvs.js';
+import { readCSVS } from './parse/csvs.js';
+import { parseVK } from './parse/vk.js';
+import { writeCSVS } from './build/csvs.js';
 import stream from 'stream';
 import util from 'util';
 import path from 'path';
@@ -33,15 +33,30 @@ function readFS(path) {
   // --> stream entries -->
 }
 
+async function isCSVS(sourcePath) {
+  try {
+    await fs.promises.readFile(`${sourcePath}/metadir.json`)
+
+    return true
+  } catch {
+    return false
+  }
+}
+
+async function isVK(sourcePath) {
+  try {
+    await fs.promises.readFile(`${sourcePath}/messages/index-messages.html`)
+
+    return true
+  } catch {
+    return false
+  }
+}
+
 // @param {string} sourcePath - Path to source
 // @param {string} query - Query string
 // @returns {Stream}
 async function readStream(sourcePath, query) {
-   // const toStream = new stream.Readable();
-  // TODO: stream object mode
-  // toStream.push(JSON.stringify({"a": "a"}))
-  // toStream.push(null);
-  // return toStream;
   // if stdin
   // // if stdin and source path
   // // // exception stdin source path
@@ -54,14 +69,15 @@ async function readStream(sourcePath, query) {
   // // // return queryStream on temporary metadir
 
   // if no stdin and no source path or source path is directory
-  // // // TODO: detect source type is csvs
-  return queryStream(sourcePath, query)
+  // // // detect source type is csvs
+  if (await isCSVS(sourcePath)) {
+    return readCSVS(sourcePath, query)
+  }
   // // // otherwise source type is fs
   // // // // return readFS stream on sourcePath
 
-  // TODO if source path is index.html
   // // if source type is vk
-  if (false) {
+  if (await isVK(sourcePath)) {
     // // // pipe stdin stream to parseVK
     return parseVK(sourcePath, query)
   }
@@ -103,8 +119,9 @@ function writeStream(targetPath, targetType) {
   // // if target path not directory
   // // // exception metadir no dir
   // // pass entry to buildCSVS stream, return
-  const isCSVS = targetType === 'csvs'
+  const isCSVS = targetPath !== undefined || targetType === 'csvs'
         || (targetPath && fs.statSync(targetPath).isDirectory())
+
   if (isCSVS) {
     return writeCSVS(path.normalize(targetPath))
   }
@@ -121,7 +138,6 @@ function writeStream(targetPath, targetType) {
     // buildBiorg()
   }
 
-    console.log("AA")
   // if no target path
   // // pass string chunk to writeStdin stream
   if (!targetPath) {
