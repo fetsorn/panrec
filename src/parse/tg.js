@@ -52,8 +52,6 @@ function parseMessage(query, partnerID, partnerName, message) {
 }
 
 export async function parseTG(sourcePath, query) {
-  const searchParams = new URLSearchParams(query);
-
   const indexPath = `${sourcePath}/result.json`;
 
   const index = JSON.parse(await fs.promises.readFile(indexPath))
@@ -73,6 +71,6 @@ export async function parseTG(sourcePath, query) {
 
     return toStream
   } catch(e) {
-    console.log("vkStream", e)
+    console.log("tgStream", e)
   }
 }

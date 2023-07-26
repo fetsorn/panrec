@@ -125,8 +125,6 @@ async function senderEntries(sourcePath, query, sender) {
 }
 
 export async function parseVK(sourcePath, query) {
-  const searchParams = new URLSearchParams(query);
-
   const indexPath = `${sourcePath}/messages/index-messages.html`;
 
   const iconv = new Iconv('CP1251', 'UTF-8');
