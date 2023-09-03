@@ -49,7 +49,21 @@ export function writeCSVS(targetPath) {
       root += pathElement;
     }
 
-    await fs.promises.writeFile(realpath, content);
+    // NOTE: this dance is supposed to guarantee that realpath is not invalid
+    // a writeFile to realpath would make realpath invalid during writing
+    const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'csvs-'))
+
+    const tmpPath = path.join(tmpdir, 'tmp')
+
+    await fs.promises.writeFile(tmpPath, content);
+
+    // here realpath does not exist
+    await fs.promises.unlink(realpath);
+
+    // here realpath is valid again
+    await fs.promises.link(tmpPath, realpath);
+
+    await fs.promises.rm(tmpdir);
   }
 
   const csvs = new CSVS({
