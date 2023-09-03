@@ -61,7 +61,7 @@ export function writeCSVS(targetPath) {
     objectMode: true,
     async write(entry, encoding, next) {
       // TODO: check that entry is valid for csvs
-      await csvs.update(JSON.parse(entry))
+      await csvs.update(entry)
     },
     close() {
     },

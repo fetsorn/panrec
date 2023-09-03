@@ -61,7 +61,7 @@ async function isJSON(sourcePath) {
   return (new RegExp(/json$/)).test(sourcePath)
 }
 
-async function transformStream(query) {
+async function transformStream(sourcePath, query) {
   // if stdin
   // // if stdin and source path
   // // // exception stdin source path
@@ -73,7 +73,7 @@ async function transformStream(query) {
   // // // pipe stdin stream to writeTmpMetadir
   // // // return queryStream on temporary metadir
 
-  return parseListing(query)
+  return parseListing(sourcePath, query)
 }
 
 // @param {string} sourcePath - Path to source
@@ -134,7 +134,6 @@ function buildBiorg(entry) {
 }
 
 function writeStream(targetPath, targetType) {
-
   // if target type is csvs or target path is directory
   // // if target path not directory
   // // // exception metadir no dir
@@ -149,7 +148,7 @@ function writeStream(targetPath, targetType) {
   // TODO: unite with output stream
   // if no target type or target type is json
   // // pass json entry to buildJson
-  if (!targetType || targetType === 'json') {
+  if (targetPath && targetType === 'json') {
     return buildJson(targetPath)
   }
   // if target type is biorg
@@ -189,8 +188,12 @@ function writeStream(targetPath, targetType) {
 
       try {
         await pipeline(
-          isStdin ? process.stdin : await readStream(options.sourcePath, options.query),
-          // isStdin ? await transformStream(options.query) : stream.Passthrough,
+          isStdin
+            ? process.stdin
+            : await readStream(options.sourcePath, options.query),
+          isStdin
+            ? await transformStream(options.sourcePath, options.query)
+            : new stream.PassThrough(),
           // gcStream(options.gc),
           // mapStream(),
           writeStream(options.targetPath, options.targetType)
