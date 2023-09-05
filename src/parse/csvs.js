@@ -56,22 +56,29 @@ async function fetchCallback(filepath) {
 export async function readCSVS(sourcePath, query) {
   const searchParams = new URLSearchParams(query);
 
-  try {
-    const overview = await (new CSVS({
+  const csvs = new CSVS({
       readFile: async (filepath) => fetchCallback(path.join(sourcePath, filepath)),
       grep: grepCallback,
-    })).select(searchParams);
+    });
 
-    const toStream = new stream.Readable();
+  const queryStream = await csvs.selectStream(searchParams);
 
-    for (const entry of overview) {
-      toStream.push(JSON.stringify(entry, 2))
-    }
+  return queryStream;
 
-    toStream.push(null);
+  // try {
+  //   // TODO: replace with a stream
+  //   const overview = await ().select(searchParams);
 
-    return toStream
-  } catch(e) {
-    console.log("queryStream", e)
-  }
+  //   const toStream = new stream.Readable();
+
+  //   for (const entry of overview) {
+  //     toStream.push(JSON.stringify(entry, 2))
+  //   }
+
+  //   toStream.push(null);
+
+  //   return toStream
+  // } catch(e) {
+  //   console.log("queryStream", e)
+  // }
 }

@@ -7,6 +7,7 @@ import { parseTG } from './parse/tg.js';
 import { parseFS } from './parse/fs.js';
 import { parseListing } from './parse/listing.js';
 import { writeCSVS } from './build/csvs.js';
+import { buildStdout } from './build/stdout.js';
 import stream from 'stream';
 import util from 'util';
 import path from 'path';
@@ -83,7 +84,7 @@ async function readStream(sourcePath, query) {
   // if no stdin and no source path or source path is directory
   // // // detect source type is csvs
   if (await isCSVS(sourcePath)) {
-    return readCSVS(sourcePath, query)
+    return readCSVS(sourcePath, query);
   }
   // // // otherwise source type is fs
   // // // // return readFS stream on sourcePath
@@ -91,25 +92,25 @@ async function readStream(sourcePath, query) {
   // // if source type is vk
   if (await isVK(sourcePath)) {
     // // // read filesystem with parseVK
-    return parseVK(sourcePath, query)
+    return parseVK(sourcePath, query);
   }
 
   // // if source type is tg
   if (await isTG(sourcePath)) {
     // // // read filesystem with parseTG
-    return parseTG(sourcePath, query)
+    return parseTG(sourcePath, query);
   }
 
   if (await isFS(sourcePath)) {
-    return parseFS(sourcePath, query)
+    return parseFS(sourcePath, query);
   }
 
   if (await isBiorg(sourcePath)) {
-    return parseBiorg(sourcePath, query)
+    return parseBiorg(sourcePath, query);
   }
 
   if (await isJSON(sourcePath)) {
-    return parseJSON(sourcePath, query)
+    return parseJSON(sourcePath, query);
   }
 }
 
@@ -131,6 +132,23 @@ function buildJson(entry) {
 }
 
 function buildBiorg(entry) {
+}
+
+function passthroughStream() {
+  return new stream.Transform({
+    objectMode: true,
+
+    async write(entry, encoding, next) {
+      this.push(entry);
+    },
+
+    close() {
+    },
+
+    abort(err) {
+      console.log("Sink error:", err);
+    },
+  });
 }
 
 function writeStream(targetPath, targetType) {
@@ -160,8 +178,7 @@ function writeStream(targetPath, targetType) {
   // if no target path
   // // pass string chunk to writeStdin stream
   if (!targetPath) {
-    // TODO: wrap in a transform to accept entries as objects
-    return process.stdout;
+    return buildStdout();
   }
 
   // if target path is file
@@ -191,9 +208,9 @@ function writeStream(targetPath, targetType) {
           isStdin
             ? process.stdin
             : await readStream(options.sourcePath, options.query),
-          isStdin
-            ? await transformStream(options.sourcePath, options.query)
-            : new stream.PassThrough(),
+          // isStdin
+          //   ? await transformStream(options.sourcePath, options.query)
+          //   : passthroughStream(),
           // gcStream(options.gc),
           // mapStream(),
           writeStream(options.targetPath, options.targetType)

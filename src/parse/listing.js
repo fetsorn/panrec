@@ -67,6 +67,7 @@ export async function parseListing(sourcePath, query) {
 
   return new stream.Transform({
     objectMode: true,
+
     async transform(chunk, encoding, callback) {
       const content = (this._buffer ?? "") + String(chunk);
 
