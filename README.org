@@ -1,0 +1,58 @@
+#+title: csvs-nodejs
+#+OPTIONS: toc:nil
+
+csvs-nodejs - read and write csvs database from command-line.
+
+* Developer Information and Tools
+** Install dependencies
+You'll need to install nodejs >= 18.15.0. We use yarn but npm should work too. Assuming that's done, run `yarn` with no args:
+
+#+begin_src sh
+yarn
+#+end_src
+** Run with node
+
+#+begin_src sh
+node src/index.js
+#+end_src
+* Documentation
+** Structure of the repo
+[[src/index.js][index.js]] - main cli setup
+
+[[src/parse][parse]] - streams that parse various format into json entries
+
+[[src/build][build]] - streams that write json entries to various formats
+
+[[src/utils][utils]] - common utility code for streams
+* Usage
+#+begin_src txt
+Usage: csvs [options]
+
+Manage csvs databases.
+
+Options:
+  -v, --version               output the version number
+  -i, --source-path <string>  Path to source (default: "/Users/fetsorn/mm/codes/csvs-nodejs")
+  -o, --target-path <string>  Path to target
+  -t, --target-type <string>  Type of target (default: "json")
+  -q, --query <string>        Search string (default: "?")
+  --gc                        Collect dangling database nodes
+  -h, --help                  display help for command
+#+end_src
+
+#+begin_src sh
+# output as json
+node src/index.js -i /path/to/csvs-database
+
+# query all entries that have a filename starting with "2005"
+node src/index.js -i /path/to/csvs-database -q "?filename=2005.*"
+
+# query all entries of type filename
+node src/index.js -i /path/to/csvs-database -q "?_=filename"
+
+# write entries from source to target database
+node src/index.js -i /path/to/source-database -o /path/to/target-database
+
+# cache file metadata from source folder to target database
+node src/index.js -i /path/to/source-folder -o /path/to/target-database
+#+end_src

@@ -48,7 +48,7 @@ async function isFS(sourcePath) {
   try {
     const stats = await fs.promises.stat(sourcePath)
 
-    return stat.isDirectory()
+    return stats.isDirectory()
   } catch {
     return false
   }
@@ -140,6 +140,8 @@ function passthroughStream() {
 
     async write(entry, encoding, next) {
       this.push(entry);
+
+      next()
     },
 
     close() {
@@ -199,7 +201,7 @@ function writeStream(targetPath, targetType) {
     // TODO if targetPath is specified, targetType defaults to "csvs"
     .option('-t, --target-type <string>', 'Type of target', 'json')
     .option('-q, --query <string>', 'Search string', '?')
-    .option('--gc', 'Collect dangling database nodes')
+    // .option('--gc', 'Collect dangling database nodes')
     .action(async (options) => {
       const isStdin = process.stdin.isTTY === undefined
 
@@ -208,9 +210,9 @@ function writeStream(targetPath, targetType) {
           isStdin
             ? process.stdin
             : await readStream(options.sourcePath, options.query),
-          // isStdin
-          //   ? await transformStream(options.sourcePath, options.query)
-          //   : passthroughStream(),
+          isStdin
+            ? await transformStream(options.sourcePath, options.query)
+            : passthroughStream(),
           // gcStream(options.gc),
           // mapStream(),
           writeStream(options.targetPath, options.targetType)
