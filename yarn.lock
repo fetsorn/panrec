@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@fetsorn/csvs-js@^0.11.1":
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/@fetsorn/csvs-js/-/csvs-js-0.11.1.tgz#4336937ae34a5aa22c187297c0d369e3a06335a6"
-  integrity sha512-O0fDnHRJExrNpJ6+Clz7vIWYUdeW1al8N9QQsfc5sUAGLWSONzIEMGE9g1ZWAt2lWH5jHyTPmHnKlPZ3OUTQbg==
+"@fetsorn/csvs-js@^0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/@fetsorn/csvs-js/-/csvs-js-0.13.0.tgz#21d06e13e631a632affd6eb7dcb0eeb7d575d23d"
+  integrity sha512-OsEtLo5+Xs1F571nuQj6ZtVUHTI2XC7m+sfviqJbNrbP8KS1dTwo1KTALb6a7DdPBcCHs3QUVs+NqDORmq61Mg==
 
 chalk@^5.2.0:
   version "5.2.0"
