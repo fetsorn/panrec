@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import stream from 'stream';
+import process from 'process';
+import { spawn } from 'child_process';
 import { fileURLToPath, URLSearchParams } from 'node:url';
 import { CSVS } from '@fetsorn/csvs-js';
 
@@ -14,31 +16,45 @@ async function grepCallback(contentFile, patternFile, isInverse) {
 
   const patternFilePath = `/tmp/${crypto.randomUUID()}`;
 
+  const outputFilePath = `/tmp/${crypto.randomUUID()}`;
+
   await fs.promises.writeFile(contentFilePath, contentFile);
 
   await fs.promises.writeFile(patternFilePath, patternFile);
 
-  let output = '';
+  const outputStream = fs.createWriteStream(outputFilePath);
 
   try {
-    // console.log(`grep ${contentFile} for ${patternFile}`)
-    const { stdout, stderr } = await promisify(exec)(
-      'export PATH=$PATH:~/.nix-profile/bin/; '
-        + `rg ${isInverse ? '-v' : ''} -f ${patternFilePath} ${contentFilePath}`,
-    );
+    await new Promise((res, rej) => {
+      const cmd = `/Users/fetsorn/.nix-profile/bin/rg`;
 
-    if (stderr) {
-      console.log('grep cli failed', stderr);
-    } else {
-      output = stdout;
-    }
-  } catch (e) {
-    // console.log('grep cli returned empty', e);
+      const flags = (isInverse ? ['-v'] : []).concat(["-f", patternFilePath, contentFilePath]);
+
+      const top = spawn(cmd, flags);
+
+      top.stdout.on('data', (data) => {
+        outputStream.write(data)
+      });
+
+      top.stderr.on('data', (data) => {
+        rej(data.toString())
+      });
+
+      top.on('close', (code) => {
+        res()
+      });
+    })
+  } catch(e) {
+    console.log("AAA", e)
   }
+
+  const output = await fs.promises.readFile(outputFilePath, { encoding: 'utf8' });
 
   await fs.promises.unlink(contentFilePath);
 
   await fs.promises.unlink(patternFilePath);
+
+  await fs.promises.unlink(outputFilePath);
 
   return output;
 }
@@ -64,21 +80,4 @@ export async function readCSVS(sourcePath, query) {
   const queryStream = await csvs.selectStream(searchParams);
 
   return queryStream;
-
-  // try {
-  //   // TODO: replace with a stream
-  //   const overview = await ().select(searchParams);
-
-  //   const toStream = new stream.Readable();
-
-  //   for (const entry of overview) {
-  //     toStream.push(JSON.stringify(entry, 2))
-  //   }
-
-  //   toStream.push(null);
-
-  //   return toStream
-  // } catch(e) {
-  //   console.log("queryStream", e)
-  // }
 }
