@@ -62,7 +62,7 @@ async function isJSON(sourcePath) {
   return (new RegExp(/json$/)).test(sourcePath)
 }
 
-async function transformStream(sourcePath, query) {
+async function transformStream(sourcePath, query, doHashsum) {
   // if stdin
   // // if stdin and source path
   // // // exception stdin source path
@@ -74,13 +74,13 @@ async function transformStream(sourcePath, query) {
   // // // pipe stdin stream to writeTmpMetadir
   // // // return queryStream on temporary metadir
 
-  return parseListing(sourcePath, query)
+  return parseListing(sourcePath, query, doHashsum)
 }
 
 // @param {string} sourcePath - Path to source
 // @param {string} query - Query string
 // @returns {Stream}
-async function readStream(sourcePath, query) {
+async function readStream(sourcePath, query, doHashsum) {
   // if no stdin and no source path or source path is directory
   // // // detect source type is csvs
   if (await isCSVS(sourcePath)) {
@@ -102,7 +102,7 @@ async function readStream(sourcePath, query) {
   }
 
   if (await isFS(sourcePath)) {
-    return parseFS(sourcePath, query);
+    return parseFS(sourcePath, query, doHashsum);
   }
 
   if (await isBiorg(sourcePath)) {
@@ -198,6 +198,7 @@ function writeStream(targetPath, targetType) {
     .version(packageJSON.version, '-v, --version')
     .option('-i, --source-path <string>', 'Path to source', process.cwd())
     .option('-o, --target-path <string>', 'Path to target')
+    .option('--hashsum', 'Hashum files during caching', false)
     // TODO if targetPath is specified, targetType defaults to "csvs"
     .option('-t, --target-type <string>', 'Type of target', 'json')
     .option('-q, --query <string>', 'Search string', '?')
@@ -209,9 +210,9 @@ function writeStream(targetPath, targetType) {
         await pipeline(
           isStdin
             ? process.stdin
-            : await readStream(options.sourcePath, options.query),
+            : await readStream(options.sourcePath, options.query, options.hashsum),
           isStdin
-            ? await transformStream(options.sourcePath, options.query)
+            ? await transformStream(options.sourcePath, options.query, options.hashsum)
             : passthroughStream(),
           // gcStream(options.gc),
           // mapStream(),

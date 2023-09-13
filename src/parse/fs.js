@@ -7,7 +7,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat.js'
 import { digestMessage, randomUUID } from '@fetsorn/csvs-js';
 dayjs.extend(customParseFormat)
 
-async function foo(sourceAbsolutePath, relativePath, searchParams) {
+async function statPath(sourceAbsolutePath, relativePath, searchParams, doHashsum) {
   const absolutePath = path.join(sourceAbsolutePath, relativePath)
 
   const files = await fs.promises.readdir(absolutePath)
@@ -20,7 +20,7 @@ async function foo(sourceAbsolutePath, relativePath, searchParams) {
     const stats = await fs.promises.stat(fileAbsolutePath)
 
     if (stats.isDirectory()) {
-      return foo(sourceAbsolutePath, fileRelativePath, searchParams)
+      return statPath(sourceAbsolutePath, fileRelativePath, searchParams, doHashsum)
     }
 
     const entry = {
@@ -37,6 +37,22 @@ async function foo(sourceAbsolutePath, relativePath, searchParams) {
         }]
       },
       category: "fs"
+    }
+
+    if (doHashsum) {
+      try {
+        const input = await fs.createReadStream(fileAbsolutePath)
+
+        const hash = crypto.createHash('sha256');
+
+        await stream.promises.pipeline(input, hash);
+
+        const hashHex = hash.digest('hex');
+
+        entry.files.items[0].filehash = hashHex
+      } catch(e) {
+        console.error(fileAbsolutePath, e)
+      }
     }
 
     const date = dayjs(stats.mtime)
@@ -56,10 +72,10 @@ async function foo(sourceAbsolutePath, relativePath, searchParams) {
   }))).flat()
 }
 
-export async function parseFS(sourcePath, query) {
+export async function parseFS(sourcePath, query, doHashsum) {
   const searchParams = new URLSearchParams(query);
 
-  const entries = await foo(sourcePath, "", searchParams);
+  const entries = await statPath(sourcePath, "", searchParams, doHashsum);
 
   try {
     const toStream = new stream.Readable({objectMode: true});

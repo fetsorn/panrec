@@ -1,4 +1,5 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { CSVS } from '@fetsorn/csvs-js';
 
@@ -57,13 +58,16 @@ export function writeCSVS(targetPath) {
 
     await fs.promises.writeFile(tmpPath, content);
 
-    // here realpath does not exist
-    await fs.promises.unlink(realpath);
+    try {
+      await fs.promises.unlink(realpath);
+    } catch {
+      // if no file, do nothing
+    }
 
     // here realpath is valid again
     await fs.promises.link(tmpPath, realpath);
 
-    await fs.promises.rm(tmpdir);
+    await fs.promises.rm(tmpdir, {recursive: true});
   }
 
   const csvs = new CSVS({
