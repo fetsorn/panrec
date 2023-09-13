@@ -6,19 +6,12 @@ export function buildBiorg(targetPath) {
 		objectMode: true,
 
 		async write(entry, encoding, next) {
-			console.log(entry);
-			console.log(`*.
-				:PROPERTIES:
-				:_: ${entry._}
-				:UUID: ${entry.UUID}
-				:DATUM: ${entry.datum}
-				:ACT_DATE: ${entry.actdate}
-				:SAY_DATE: ${entry.saydate}
-				:CATEGORY: ${entry.category}
-				:ACT_NAME: ${entry.actname}
-				:SAY_NAME: ${entry.sayname}
-				:END:
-				* .`);
+			console.log(`* .`);
+			console.log(`:PROPERTIES:`);
+			Object.keys(entry).forEach(key => {
+				console.log(`:${key.toUpperCase()}:`, entry[key]);
+			});
+			console.log(`:END:`);
 		},
 
 		close() {},
