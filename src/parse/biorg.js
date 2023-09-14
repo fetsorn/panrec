@@ -5,7 +5,6 @@ import { URLSearchParams } from 'node:url';
 import { Iconv } from 'iconv';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import org from 'org-mode-parser';
-dayjs.extend(customParseFormat);
 export async function parseBiorg(sourcePath, query) {
   const index = await fs.promises.readFile(sourcePath);
   org.makelist(sourcePath, function (nl) {
