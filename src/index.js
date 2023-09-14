@@ -7,7 +7,9 @@ import { parseTG } from './parse/tg.js';
 import { parseFS } from './parse/fs.js';
 import { parseListing } from './parse/listing.js';
 import { writeCSVS } from './build/csvs.js';
+import { buildBiorg } from './build/biorg.js';
 import { buildStdout } from './build/stdout.js';
+import { parseBiorg } from './parse/biorg.js';
 import stream from 'stream';
 import util from 'util';
 import path from 'path';
@@ -16,50 +18,50 @@ const pipeline = util.promisify(stream.pipeline);
 
 async function isCSVS(sourcePath) {
   try {
-    await fs.promises.readFile(`${sourcePath}/metadir.json`)
+    await fs.promises.readFile(`${sourcePath}/metadir.json`);
 
-    return true
+    return true;
   } catch {
-    return false
+    return false;
   }
 }
 
 async function isVK(sourcePath) {
   try {
-    await fs.promises.readFile(`${sourcePath}/messages/index-messages.html`)
+    await fs.promises.readFile(`${sourcePath}/messages/index-messages.html`);
 
-    return true
+    return true;
   } catch {
-    return false
+    return false;
   }
 }
 
 async function isTG(sourcePath) {
   try {
-    await fs.promises.readFile(`${sourcePath}/result.json`)
+    await fs.promises.readFile(`${sourcePath}/result.json`);
 
-    return true
+    return true;
   } catch {
-    return false
+    return false;
   }
 }
 
 async function isFS(sourcePath) {
   try {
-    const stats = await fs.promises.stat(sourcePath)
+    const stats = await fs.promises.stat(sourcePath);
 
-    return stats.isDirectory()
+    return stats.isDirectory();
   } catch {
-    return false
+    return false;
   }
 }
 
 async function isBiorg(sourcePath) {
-  return (new RegExp(/org$/)).test(sourcePath)
+  return new RegExp(/org$/).test(sourcePath);
 }
 
 async function isJSON(sourcePath) {
-  return (new RegExp(/json$/)).test(sourcePath)
+  return new RegExp(/json$/).test(sourcePath);
 }
 
 async function transformStream(sourcePath, query) {
@@ -74,7 +76,7 @@ async function transformStream(sourcePath, query) {
   // // // pipe stdin stream to writeTmpMetadir
   // // // return queryStream on temporary metadir
 
-  return parseListing(sourcePath, query)
+  return parseListing(sourcePath, query);
 }
 
 // @param {string} sourcePath - Path to source
@@ -128,11 +130,7 @@ function mapStream() {
 
 // builds json array string from json objects
 // @returns stream
-function buildJson(entry) {
-}
-
-function buildBiorg(entry) {
-}
+function buildJson(entry) {}
 
 function passthroughStream() {
   return new stream.Transform({
@@ -141,14 +139,13 @@ function passthroughStream() {
     async write(entry, encoding, next) {
       this.push(entry);
 
-      next()
+      next();
     },
 
-    close() {
-    },
+    close() {},
 
     abort(err) {
-      console.log("Sink error:", err);
+      console.log('Sink error:', err);
     },
   });
 }
@@ -158,23 +155,25 @@ function writeStream(targetPath, targetType) {
   // // if target path not directory
   // // // exception metadir no dir
   // // pass entry to buildCSVS stream, return
-  const isCSVS = targetPath !== undefined || targetType === 'csvs'
-        || (targetPath && fs.statSync(targetPath).isDirectory())
+  const isCSVS =
+    targetPath !== undefined ||
+    targetType === 'csvs' ||
+    (targetPath && fs.statSync(targetPath).isDirectory());
 
   if (isCSVS) {
-    return writeCSVS(path.normalize(targetPath))
+    return writeCSVS(path.normalize(targetPath));
   }
 
   // TODO: unite with output stream
   // if no target type or target type is json
   // // pass json entry to buildJson
   if (targetPath && targetType === 'json') {
-    return buildJson(targetPath)
+    return buildJson(targetPath);
   }
   // if target type is biorg
   // // pass json entry to buildBiorg stream
   if (targetType === 'biorg') {
-    return buildBiorg(targetPath)
+    return buildBiorg(targetPath);
   }
 
   // if no target path
@@ -186,7 +185,7 @@ function writeStream(targetPath, targetType) {
   // if target path is file
   // // pass string chunk to writeFile stream
   // otherwise throw
-  return fs.createWriteStream(path.normalize(targetPath))
+  return fs.createWriteStream(path.normalize(targetPath));
 }
 
 (async () => {
@@ -202,8 +201,8 @@ function writeStream(targetPath, targetType) {
     .option('-t, --target-type <string>', 'Type of target', 'json')
     .option('-q, --query <string>', 'Search string', '?')
     // .option('--gc', 'Collect dangling database nodes')
-    .action(async (options) => {
-      const isStdin = process.stdin.isTTY === undefined
+    .action(async options => {
+      const isStdin = process.stdin.isTTY === undefined;
 
       try {
         await pipeline(
@@ -216,9 +215,9 @@ function writeStream(targetPath, targetType) {
           // gcStream(options.gc),
           // mapStream(),
           writeStream(options.targetPath, options.targetType)
-        )
-      } catch(e) {
-        console.log("pipeline", e)
+        );
+      } catch (e) {
+        console.log('pipeline', e);
       }
     });
 
