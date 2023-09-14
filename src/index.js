@@ -9,6 +9,7 @@ import { parseListing } from './parse/listing.js';
 import { writeCSVS } from './build/csvs.js';
 import { buildBiorg } from './build/biorg.js';
 import { buildStdout } from './build/stdout.js';
+import { parseBiorg } from './parse/biorg.js';
 import stream from 'stream';
 import util from 'util';
 import path from 'path';

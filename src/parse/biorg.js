@@ -3,23 +3,31 @@ import path from 'path';
 import stream from 'stream';
 import { URLSearchParams } from 'node:url';
 import { Iconv } from 'iconv';
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat.js'
-dayjs.extend(customParseFormat)
-
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+import org from 'org-mode-parser';
+dayjs.extend(customParseFormat);
 export async function parseBiorg(sourcePath, query) {
-  const index = await fs.promises.readFile(sourcePath)
+	const index = await fs.promises.readFile(sourcePath);
+	// console.log(index);
+	// TODO: parse biorg
+	// TODO filter query
+	org.makelist(sourcePath, function (nl) {
+		nl.forEach(el => {
+			const datumValue = el.body.trim();
+			el.properties.datum = datumValue;
+			el.datum = datumValue;
+			console.log(JSON.stringify(el.properties));
+		});
+	});
 
-  // TODO: parse biorg
-  // TODO filter query
+	try {
+		const toStream = new stream.Readable({ objectMode: true });
 
-  try {
-    const toStream = new stream.Readable({objectMode: true});
+		toStream.push(null);
 
-    toStream.push(null);
-
-    return toStream
-  } catch(e) {
-    console.log("parseBiorg", e)
-  }
+		return toStream;
+	} catch (e) {
+		console.log('parseBiorg', e);
+	}
 }

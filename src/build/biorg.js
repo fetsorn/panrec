@@ -8,10 +8,13 @@ export function buildBiorg(targetPath) {
 		async write(entry, encoding, next) {
 			console.log(`* .`);
 			console.log(`:PROPERTIES:`);
-			Object.keys(entry).forEach(key => {
-				console.log(`:${key.toUpperCase()}:`, entry[key]);
-			});
+			Object.keys(entry)
+				.filter(key => key != 'datum')
+				.forEach(key => {
+					console.log(`:${key}:`, entry[key]);
+				});
 			console.log(`:END:`);
+			console.log(entry.datum);
 		},
 
 		close() {},
