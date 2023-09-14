@@ -32,9 +32,9 @@ const pipeline = util.promisify(stream.pipeline);
             ? await transformStream(options.sourcePath, options.query, options.hashsum)
             : passthroughStream(),
           writeStream(options.targetPath, options.targetType)
-        )
-      } catch(e) {
-        console.log("pipeline", e)
+        );
+      } catch (e) {
+        console.log('pipeline', e);
       }
     });
 
