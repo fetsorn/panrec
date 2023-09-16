@@ -5,6 +5,7 @@
   "main": "index.js",
   "bin": "index.js",
   "type": "module",
+  "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js"
   },
