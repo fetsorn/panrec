@@ -4,7 +4,7 @@ import { writeCSVS } from './csvs.js';
 import { buildStdout } from './stdout.js';
 import { buildBiorg } from './biorg.js';
 
-export function writeStream(targetPath, targetType) {
+export function exportStream(targetPath, targetType) {
   // if target type is csvs or target path is directory
   // // if target path not directory
   // // // exception metadir no dir

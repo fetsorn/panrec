@@ -1,8 +1,8 @@
 #! /usr/bin/env node
 import { Command } from 'commander';
 import { packageJSON } from './utils/packageJson.js';
-import { readStream, passthroughStream, transformStream } from './parse/index.js';
-import { writeStream } from './build/index.js';
+import { importStream, passthroughStream, transformStream } from './import/index.js';
+import { exportStream } from './export/index.js';
 import stream from 'stream';
 import util from 'util';
 const pipeline = util.promisify(stream.pipeline);
@@ -27,11 +27,11 @@ const pipeline = util.promisify(stream.pipeline);
         await pipeline(
           isStdin
             ? process.stdin
-            : await readStream(options.sourcePath, options.query, options.hashsum),
+            : await importStream(options.sourcePath, options.query, options.hashsum),
           isStdin
             ? await transformStream(options.sourcePath, options.query, options.hashsum)
             : passthroughStream(),
-          writeStream(options.targetPath, options.targetType)
+          exportStream(options.targetPath, options.targetType)
         );
       } catch (e) {
         console.log('pipeline', e);

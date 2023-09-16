@@ -92,7 +92,7 @@ export async function transformStream(sourcePath, query, doHashsum) {
 // @param {string} sourcePath - Path to source
 // @param {string} query - Query string
 // @returns {Stream}
-export async function readStream(sourcePath, query, doHashsum) {
+export async function importStream(sourcePath, query, doHashsum) {
   // if no stdin and no source path or source path is directory
   // // // detect source type is csvs
   if (await isCSVS(sourcePath)) {
