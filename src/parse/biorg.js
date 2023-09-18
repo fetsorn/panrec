@@ -12,6 +12,7 @@ export async function parseBiorg(sourcePath, query) {
       const datumValue = el.body.trim();
       el.properties.datum = datumValue;
       console.log(JSON.stringify(el.properties));
+      console.log(el);
     });
   });
 
