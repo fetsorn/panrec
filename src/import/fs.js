@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import stream from 'stream';
+import crypto from 'crypto';
 import { URLSearchParams } from 'node:url';
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat.js'
@@ -33,7 +34,7 @@ async function statPath(sourceAbsolutePath, relativePath, searchParams, doHashsu
           _: "file",
           UUID: await digestMessage(await randomUUID()),
           filename: fileRelativePath,
-          filehash: ""
+          sourcepath: sourceAbsolutePath,
         }]
       },
       category: "fs"

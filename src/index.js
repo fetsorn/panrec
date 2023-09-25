@@ -17,6 +17,7 @@ const pipeline = util.promisify(stream.pipeline);
     .option('-i, --source-path <string>', 'Path to source', process.cwd())
     .option('-o, --target-path <string>', 'Path to target')
     .option('--hashsum', 'Hashsum files during caching', false)
+    .option('--yank', 'Yank files to target database', false)
     // TODO if targetPath is specified, targetType defaults to "csvs"
     .option('-t, --target-type <string>', 'Type of target', 'json')
     .option('-q, --query <string>', 'Search string', '?')
@@ -31,7 +32,7 @@ const pipeline = util.promisify(stream.pipeline);
           isStdin
             ? await transformStream(options.sourcePath, options.query, options.hashsum)
             : passthroughStream(),
-          exportStream(options.targetPath, options.targetType)
+          exportStream(options.targetPath, options.targetType, options.yank)
         );
       } catch (e) {
         console.log('pipeline', e);

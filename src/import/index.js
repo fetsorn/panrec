@@ -1,6 +1,7 @@
 import fs from 'fs';
 import stream from 'stream';
 import { readCSVS } from './csvs.js';
+import { parseJSON, parseJSONStream } from './json.js';
 import { parseVK } from './vk.js';
 import { parseTG } from './tg.js';
 import { parseFS } from './fs.js';
@@ -75,18 +76,28 @@ export function passthroughStream() {
 }
 
 export async function transformStream(sourcePath, query, doHashsum) {
-  // if stdin
-  // // if stdin and source path
-  // // // exception stdin source path
-  // // if source type is biorg
-  // // // pipe stdin stream to parseBiorg
-  // // if source type is json
-  // // // pipe stdin stream to parseJson
-  // // if source type is csvs metadir stream
-  // // // pipe stdin stream to writeTmpMetadir
-  // // // return queryStream on temporary metadir
+  // if stdin and source path
+  // // exception stdin source path
 
-  return parseListing(sourcePath, query, doHashsum)
+ 
+  // if source type is biorg
+  // // pipe stdin stream to parseBiorg
+
+  // if source type is json
+  // // pipe stdin stream to parseJson
+  if (true) {
+    return parseJSONStream(query)
+  }
+
+  // if source type is csvs metadir stream
+  // // pipe stdin stream to writeTmpMetadir
+  // // return queryStream on temporary metadir
+
+  // if source type is filesystem listing
+  // // pipe stdin stream to parseListing
+  if (true) {
+    return parseListing(sourcePath, query, doHashsum)
+  }
 }
 
 // @param {string} sourcePath - Path to source

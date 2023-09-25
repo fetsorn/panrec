@@ -3,7 +3,38 @@ import os from 'os';
 import path from 'path';
 import { CSVS } from '@fetsorn/csvs-js';
 
-export function writeCSVS(targetPath) {
+export async function addLFS({
+  fs,
+  dir,
+  filepath,
+}) {
+  const fileBlob = await fs.promises.readFile(path.join(dir, filepath));
+
+  const { buildPointerInfo, formatPointerInfo } = await import('@fetsorn/isogit-lfs');
+
+  const pointerInfo = await buildPointerInfo(fileBlob);
+
+  // turn blob into pointer
+  const pointerBlob = formatPointerInfo(pointerInfo);
+
+  const { writeBlob, updateIndex } = await import('isomorphic-git');
+
+  const pointerOID = await writeBlob({
+    fs,
+    dir,
+    blob: pointerBlob,
+  });
+
+  await updateIndex({
+    fs,
+    dir,
+    filepath,
+    oid: pointerOID,
+    add: true,
+  });
+}
+
+export function writeCSVS(targetPath, doYank) {
   async function readFile(filepath) {
     const realpath = path.join(targetPath, filepath);
 
@@ -80,6 +111,30 @@ export function writeCSVS(targetPath) {
     async write(entry, encoding, next) {
       // TODO: check that entry is valid for csvs
       await csvs.update(entry)
+
+      if (doYank) {
+        if (entry.files.items[0]) {
+          try {
+            const { sourcepath, filename, filehash } = entry.files.items[0];
+
+            const filepath = path.join("lfs", filehash)
+
+            await fs.promises.copyFile(
+              path.join(sourcepath, filename),
+              path.join(targetPath, filepath)
+            );
+
+            await addLFS({
+              fs,
+              dir: targetPath,
+              filepath,
+            });
+          } catch(e) {
+            // do nothing
+            // console.log(e)
+          }
+        }
+      }
     },
     close() {
     },

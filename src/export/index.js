@@ -4,7 +4,7 @@ import { writeCSVS } from './csvs.js';
 import { buildStdout } from './stdout.js';
 import { buildBiorg } from './biorg.js';
 
-export function exportStream(targetPath, targetType) {
+export function exportStream(targetPath, targetType, doYank) {
   // if target type is csvs or target path is directory
   // // if target path not directory
   // // // exception metadir no dir
@@ -13,7 +13,7 @@ export function exportStream(targetPath, targetType) {
         || (targetPath && fs.statSync(targetPath).isDirectory())
 
   if (isCSVS) {
-    return writeCSVS(path.normalize(targetPath))
+    return writeCSVS(path.normalize(targetPath), doYank)
   }
 
   // TODO: unite with output stream
