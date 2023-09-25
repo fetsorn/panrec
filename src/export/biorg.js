@@ -25,7 +25,7 @@ export function buildBiorg(targetPath) {
 
       console.log(`* .`);
       console.log(`:PROPERTIES:`);
-      for (const [key, value] of Object.entries(entry)) {
+      for (const [key, value] of Object.entries(entry).filter(([k,v]) => k !== 'datum')) {
         console.log(`:${key}:`, value);
       }
       console.log(`:END:`);
