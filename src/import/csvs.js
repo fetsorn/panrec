@@ -28,27 +28,33 @@ async function grepCallback(contentFile, patternFile, isInverse) {
     await new Promise((res, rej) => {
       const cmd = `/Users/fetsorn/.nix-profile/bin/rg`;
 
-      const flags = (isInverse ? ['-v'] : []).concat(["-f", patternFilePath, contentFilePath]);
+      const flags = (isInverse ? ['-v'] : []).concat([
+        '-f',
+        patternFilePath,
+        contentFilePath,
+      ]);
 
       const top = spawn(cmd, flags);
 
-      top.stdout.on('data', (data) => {
-        outputStream.write(data)
+      top.stdout.on('data', data => {
+        outputStream.write(data);
       });
 
-      top.stderr.on('data', (data) => {
-        rej(data.toString())
+      top.stderr.on('data', data => {
+        rej(data.toString());
       });
 
-      top.on('close', (code) => {
-        res()
+      top.on('close', code => {
+        res();
       });
-    })
-  } catch(e) {
-    console.log("AAA", e)
+    });
+  } catch (e) {
+    console.log('AAA', e);
   }
 
-  const output = await fs.promises.readFile(outputFilePath, { encoding: 'utf8' });
+  const output = await fs.promises.readFile(outputFilePath, {
+    encoding: 'utf8',
+  });
 
   await fs.promises.unlink(contentFilePath);
 
@@ -73,9 +79,9 @@ export async function readCSVS(sourcePath, query) {
   const searchParams = new URLSearchParams(query);
 
   const csvs = new CSVS({
-      readFile: async (filepath) => fetchCallback(path.join(sourcePath, filepath)),
-      grep: grepCallback,
-    });
+    readFile: async filepath => fetchCallback(path.join(sourcePath, filepath)),
+    grep: grepCallback,
+  });
 
   const queryStream = await csvs.selectStream(searchParams);
 
