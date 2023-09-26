@@ -19,12 +19,9 @@ export function buildBiorg(targetPath) {
     objectMode: true,
 
     async write(entry, encoding, next) {
-      console.log(entry);
-
       for (const key of Object.keys(entry).filter(key => key !== 'datum')) {
         entry[key] = objectToBiorgFormat(entry[key]);
       }
-      console.log(entry);
 
       console.log(`* .`);
       console.log(`:PROPERTIES:`);
