@@ -4,7 +4,7 @@ import path from 'path';
 export function buildBiorg(targetPath) {
   function objectToBiorgFormat(obj) {
     if (typeof obj !== 'object' || obj === null) {
-      return JSON.stringify(obj);
+      return obj;
     }
     if (Array.isArray(obj)) {
       return `(${obj.map(objectToBiorgFormat).join(' ')})`;
@@ -19,13 +19,18 @@ export function buildBiorg(targetPath) {
     objectMode: true,
 
     async write(entry, encoding, next) {
+      console.log(entry);
+
       for (const key of Object.keys(entry).filter(key => key !== 'datum')) {
         entry[key] = objectToBiorgFormat(entry[key]);
       }
+      console.log(entry);
 
       console.log(`* .`);
       console.log(`:PROPERTIES:`);
-      for (const [key, value] of Object.entries(entry).filter(([k,v]) => k !== 'datum')) {
+      for (const [key, value] of Object.entries(entry).filter(
+        ([k, v]) => k !== 'datum'
+      )) {
         console.log(`:${key}:`, value);
       }
       console.log(`:END:`);

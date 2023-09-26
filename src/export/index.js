@@ -9,23 +9,25 @@ export function exportStream(targetPath, targetType, doYank) {
   // // if target path not directory
   // // // exception metadir no dir
   // // pass entry to buildCSVS stream, return
-  const isCSVS = targetPath !== undefined || targetType === 'csvs'
-        || (targetPath && fs.statSync(targetPath).isDirectory())
+  const isCSVS =
+    targetPath !== undefined ||
+    targetType === 'csvs' ||
+    (targetPath && fs.statSync(targetPath).isDirectory());
 
   if (isCSVS) {
-    return writeCSVS(path.normalize(targetPath), doYank)
+    return writeCSVS(path.normalize(targetPath), doYank);
   }
 
   // TODO: unite with output stream
   // if no target type or target type is json
   // // pass json entry to buildJson
   if (targetPath && targetType === 'json') {
-    return buildJson(targetPath)
+    return buildJson(targetPath);
   }
   // if target type is biorg
   // // pass json entry to buildBiorg stream
   if (targetType === 'biorg') {
-    return buildBiorg(targetPath)
+    return buildBiorg(targetPath);
   }
 
   // if no target path
@@ -37,5 +39,5 @@ export function exportStream(targetPath, targetType, doYank) {
   // if target path is file
   // // pass string chunk to writeFile stream
   // otherwise throw
-  return fs.createWriteStream(path.normalize(targetPath))
+  return fs.createWriteStream(path.normalize(targetPath));
 }
