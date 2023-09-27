@@ -2,17 +2,20 @@ import fs from 'fs';
 import path from 'path';
 
 export function buildBiorg(targetPath) {
-  function objectToBiorgFormat(obj) {
-    if (typeof obj !== 'object' || obj === null) {
-      return obj;
+  function objectToBiorgFormat(entryValue) {
+    if (typeof entryValue !== 'object' || entryValue === null) {
+      return entryValue;
     }
-    if (Array.isArray(obj)) {
-      return `(${obj.map(objectToBiorgFormat).join(' ')})`;
+
+    if (Array.isArray(entryValue)) {
+      return `(${entryValue.map(objectToBiorgFormat).join(' ')})`;
     }
-    const keyValuePairs = Object.entries(obj)
+
+    const str = Object.entries(entryValue)
       .map(([key, value]) => `:${key} ${objectToBiorgFormat(value)}`)
       .join(' ');
-    return `(:_ '${obj._}' ${keyValuePairs})`;
+
+    return `(${str})`;
   }
 
   return new WritableStream({
