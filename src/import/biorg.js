@@ -56,6 +56,7 @@ export async function parseBiorg(sourcePath, query) {
 
   org.makelist(sourcePath, function (nl) {
     const result = nl.map(el => {
+      // console.log(el);
       const obj = {};
       obj['_'] = 'datum';
       const datumValue = el.body.trim();
