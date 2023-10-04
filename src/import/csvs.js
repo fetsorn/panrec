@@ -1,10 +1,12 @@
 import fs from 'fs';
 import path from 'path';
+import { join } from 'path';
 import stream from 'stream';
 import process from 'process';
 import { spawn } from 'child_process';
 import { fileURLToPath, URLSearchParams } from 'node:url';
 import { CSVS } from '@fetsorn/csvs-js';
+import { readdir, stat } from 'fs/promises';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -75,15 +77,93 @@ async function fetchCallback(filepath) {
   }
 }
 
-export async function readCSVS(sourcePath, query) {
-  const searchParams = new URLSearchParams(query);
+export async function readCSVS(sourcePath, query, stats) {
+  if (stats) {
+    const searchParams = new URLSearchParams(query);
 
-  const csvs = new CSVS({
-    readFile: async filepath => fetchCallback(path.join(sourcePath, filepath)),
-    grep: grepCallback,
+    const csvs = new CSVS({
+      readFile: async filepath =>
+        fetchCallback(path.join(sourcePath, filepath)),
+      grep: grepCallback,
+    });
+    const entries = await csvs.select(searchParams);
+
+    console.log(`entries: ${entries.length}`);
+    (async () => {
+      const size = await dirSize(`${sourcePath}/metadir`);
+      console.log(`size: ${size} Kb`);
+    })();
+    fs.readFile(`${sourcePath}/metadir.json`, 'utf8', (err, data) => {
+      const jsonData = JSON.parse(data);
+
+      const buildNestedObject = (jsonData, parentTrunk) => {
+        const result = {};
+
+        for (const key in jsonData) {
+          if (jsonData[key].trunk === parentTrunk) {
+            result[key] = buildNestedObject(jsonData, key);
+          }
+        }
+
+        return result;
+      };
+
+      const nestedObject = buildNestedObject(jsonData, 'datum');
+
+      const printTree = (obj, depth = 0) => {
+        const keys = Object.keys(obj);
+
+        if (depth === 0) {
+          console.log('datum');
+        }
+
+        keys.forEach(key => {
+          const indent = '  '.repeat(depth + 1);
+          console.log(indent + '|- ' + key);
+          printTree(obj[key], depth + 1);
+        });
+      };
+
+      printTree(nestedObject);
+    });
+
+    const toStream = new stream.Readable({ objectMode: true });
+
+    toStream.push(null);
+
+    return toStream;
+  } else {
+    const searchParams = new URLSearchParams(query);
+
+    const csvs = new CSVS({
+      readFile: async filepath =>
+        fetchCallback(path.join(sourcePath, filepath)),
+      grep: grepCallback,
+    });
+
+    const queryStream = await csvs.selectStream(searchParams);
+    console.log(queryStream);
+    return queryStream;
+  }
+}
+const dirSize = async dir => {
+  const files = await readdir(dir, { withFileTypes: true });
+
+  const paths = files.map(async file => {
+    const path = join(dir, file.name);
+
+    if (file.isDirectory()) return await dirSize(path);
+
+    if (file.isFile()) {
+      const { size } = await stat(path);
+
+      return size;
+    }
+
+    return 0;
   });
 
-  const queryStream = await csvs.selectStream(searchParams);
-
-  return queryStream;
-}
+  return (await Promise.all(paths))
+    .flat(Infinity)
+    .reduce((i, size) => i + size, 0);
+};

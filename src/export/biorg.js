@@ -11,9 +11,9 @@ export function buildBiorg(targetPath) {
       return `(${entryValue.map(objectToBiorgFormat).join(' ')})`;
     }
 
-    const str = Object.entries(entryValue)
+    const str = `(${Object.entries(entryValue)
       .map(([key, value]) => `:${key} ${objectToBiorgFormat(value)}`)
-      .join(' ');
+      .join(' ')})`;
 
     return `(${str})`;
   }
