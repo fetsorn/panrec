@@ -1,7 +1,11 @@
 #! /usr/bin/env node
 import { Command } from 'commander';
 import { packageJSON } from './utils/packageJson.js';
-import { importStream, passthroughStream, transformStream } from './import/index.js';
+import {
+  importStream,
+  passthroughStream,
+  transformStream,
+} from './import/index.js';
 import { exportStream } from './export/index.js';
 import stream from 'stream';
 import util from 'util';
@@ -21,16 +25,26 @@ const pipeline = util.promisify(stream.pipeline);
     // TODO if targetPath is specified, targetType defaults to "csvs"
     .option('-t, --target-type <string>', 'Type of target', 'json')
     .option('-q, --query <string>', 'Search string', '?')
-    .action(async (options) => {
-      const isStdin = process.stdin.isTTY === undefined
+    .option('--stats', 'Show database statistics', false)
+    .action(async options => {
+      const isStdin = process.stdin.isTTY === undefined;
 
       try {
         await pipeline(
           isStdin
             ? process.stdin
-            : await importStream(options.sourcePath, options.query, options.hashsum),
+            : await importStream(
+                options.sourcePath,
+                options.query,
+                options.hashsum,
+                options.stats
+              ),
           isStdin
-            ? await transformStream(options.sourcePath, options.query, options.hashsum)
+            ? await transformStream(
+                options.sourcePath,
+                options.query,
+                options.hashsum
+              )
             : passthroughStream(),
           exportStream(options.targetPath, options.targetType, options.yank)
         );

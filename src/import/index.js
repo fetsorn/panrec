@@ -10,50 +10,50 @@ import { parseListing } from './listing.js';
 
 async function isCSVS(sourcePath) {
   try {
-    await fs.promises.readFile(`${sourcePath}/metadir.json`)
+    await fs.promises.readFile(`${sourcePath}/metadir.json`);
 
-    return true
+    return true;
   } catch {
-    return false
+    return false;
   }
 }
 
 async function isVK(sourcePath) {
   try {
-    await fs.promises.readFile(`${sourcePath}/messages/index-messages.html`)
+    await fs.promises.readFile(`${sourcePath}/messages/index-messages.html`);
 
-    return true
+    return true;
   } catch {
-    return false
+    return false;
   }
 }
 
 async function isTG(sourcePath) {
   try {
-    await fs.promises.readFile(`${sourcePath}/result.json`)
+    await fs.promises.readFile(`${sourcePath}/result.json`);
 
-    return true
+    return true;
   } catch {
-    return false
+    return false;
   }
 }
 
 async function isFS(sourcePath) {
   try {
-    const stats = await fs.promises.stat(sourcePath)
+    const stats = await fs.promises.stat(sourcePath);
 
-    return stats.isDirectory()
+    return stats.isDirectory();
   } catch {
-    return false
+    return false;
   }
 }
 
 async function isBiorg(sourcePath) {
-  return (new RegExp(/org$/)).test(sourcePath)
+  return new RegExp(/org$/).test(sourcePath);
 }
 
 async function isJSON(sourcePath) {
-  return (new RegExp(/json$/)).test(sourcePath)
+  return new RegExp(/json$/).test(sourcePath);
 }
 
 export function passthroughStream() {
@@ -63,14 +63,13 @@ export function passthroughStream() {
     async write(entry, encoding, next) {
       this.push(entry);
 
-      next()
+      next();
     },
 
-    close() {
-    },
+    close() {},
 
     abort(err) {
-      console.log("Sink error:", err);
+      console.log('Sink error:', err);
     },
   });
 }
@@ -79,14 +78,13 @@ export async function transformStream(sourcePath, query, doHashsum) {
   // if stdin and source path
   // // exception stdin source path
 
- 
   // if source type is biorg
   // // pipe stdin stream to parseBiorg
 
   // if source type is json
   // // pipe stdin stream to parseJson
   if (true) {
-    return parseJSONStream(query)
+    return parseJSONStream(query);
   }
 
   // if source type is csvs metadir stream
@@ -96,18 +94,23 @@ export async function transformStream(sourcePath, query, doHashsum) {
   // if source type is filesystem listing
   // // pipe stdin stream to parseListing
   if (true) {
-    return parseListing(sourcePath, query, doHashsum)
+    return parseListing(sourcePath, query, doHashsum);
   }
 }
 
-// @param {string} sourcePath - Path to source
-// @param {string} query - Query string
-// @returns {Stream}
-export async function importStream(sourcePath, query, doHashsum) {
+/**
+ *
+ * @param {string} sourcePath - Path to source
+ * @param {string} query - Query string
+ * @param {string} doHashsum
+ * @param {boolean} stats
+ * @returns {stream}
+ */
+export async function importStream(sourcePath, query, doHashsum, stats) {
   // if no stdin and no source path or source path is directory
   // // // detect source type is csvs
   if (await isCSVS(sourcePath)) {
-    return readCSVS(sourcePath, query);
+    return readCSVS(sourcePath, query, stats);
   }
   // // // otherwise source type is fs
   // // // // return readFS stream on sourcePath
