@@ -1,94 +1,118 @@
-import fs from 'fs';
-import path from 'path';
-import stream from 'stream';
-import crypto from 'crypto';
-import { URLSearchParams } from 'node:url';
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat.js'
-import { digestMessage, randomUUID } from '@fetsorn/csvs-js';
-dayjs.extend(customParseFormat)
+import fs from "fs";
+import path from "path";
+import stream from "stream";
+import crypto from "crypto";
+import { URLSearchParams } from "node:url";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+import { digestMessage, randomUUID } from "@fetsorn/csvs-js";
 
-async function statPath(sourceAbsolutePath, relativePath, searchParams, doHashsum) {
-  const absolutePath = path.join(sourceAbsolutePath, relativePath)
+dayjs.extend(customParseFormat);
 
-  const files = await fs.promises.readdir(absolutePath)
+async function statPath(
+  sourceAbsolutePath,
+  relativePath,
+  searchParams,
+  doHashsum,
+) {
+  const absolutePath = path.join(sourceAbsolutePath, relativePath);
 
-  return (await Promise.all(files.map(async (file) => {
-    const fileRelativePath = path.join(relativePath, file)
+  const files = await fs.promises.readdir(absolutePath);
 
-    const fileAbsolutePath = path.join(sourceAbsolutePath, fileRelativePath)
+  return Promise.all(
+    files.map(async (file) => {
+      const fileRelativePath = path.join(relativePath, file);
 
-    const stats = await fs.promises.stat(fileAbsolutePath)
+      const fileAbsolutePath = path.join(sourceAbsolutePath, fileRelativePath);
 
-    if (stats.isDirectory()) {
-      return statPath(sourceAbsolutePath, fileRelativePath, searchParams, doHashsum)
-    }
+      const stats = await fs.promises.stat(fileAbsolutePath);
 
-    const entry = {
-      _: "datum",
-      datum: file,
-      files: {
-        _: "files",
-        UUID: await digestMessage(await randomUUID()),
-        items: [{
-          _: "file",
-          UUID: await digestMessage(await randomUUID()),
-          filename: fileRelativePath,
-          sourcepath: sourceAbsolutePath,
-        }]
-      },
-      category: "fs"
-    }
-
-    if (doHashsum) {
-      try {
-        const input = await fs.createReadStream(fileAbsolutePath)
-
-        const hash = crypto.createHash('sha256');
-
-        await stream.promises.pipeline(input, hash);
-
-        const hashHex = hash.digest('hex');
-
-        entry.files.items[0].filehash = hashHex
-      } catch(e) {
-        console.error(fileAbsolutePath, e)
+      if (stats.isDirectory()) {
+        return statPath(
+          sourceAbsolutePath,
+          fileRelativePath,
+          searchParams,
+          doHashsum,
+        );
       }
-    }
 
-    const date = dayjs(stats.mtime)
-          .format('YYYY-MM-DDTHH:mm:ss')
+      const entry = {
+        _: "datum",
+        datum: file,
+        files: {
+          _: "files",
+          UUID: await digestMessage(await randomUUID()),
+          items: [
+            {
+              _: "file",
+              UUID: await digestMessage(await randomUUID()),
+              filename: fileRelativePath,
+              sourcepath: sourceAbsolutePath,
+            },
+          ],
+        },
+        category: "fs",
+      };
 
-    entry.actdate = date
+      if (doHashsum) {
+        try {
+          const input = await fs.createReadStream(fileAbsolutePath);
 
-    let matchesQuery = true;
+          const hash = crypto.createHash("sha256");
 
-    for (const [key, value] of searchParams.entries()) {
-      matchesQuery = entry[key] == value
-    }
+          await stream.promises.pipeline(input, hash);
 
-    if (matchesQuery) {
-      return entry
-    }
-  }))).flat()
+          const hashHex = hash.digest("hex");
+
+          entry.files.items[0].filehash = hashHex;
+        } catch (e) {
+          console.error(fileAbsolutePath, e);
+        }
+      }
+
+      const date = dayjs(stats.mtime).format("YYYY-MM-DDTHH:mm:ss");
+
+      entry.actdate = date;
+
+      let matchesQuery = true;
+
+      searchParams.forEach((value, key) => {
+        matchesQuery = entry[key] === value;
+      });
+
+      if (matchesQuery) {
+        return entry;
+      }
+
+      return undefined;
+    }),
+  );
 }
 
-export async function parseFS(sourcePath, query, doHashsum) {
+export default async function parseFS(sourcePath, query, doHashsum) {
   const searchParams = new URLSearchParams(query);
 
-  const entries = await statPath(sourcePath, "", searchParams, doHashsum);
+  const entries = (
+    await statPath(sourcePath, "", searchParams, doHashsum)
+  ).flat();
 
-  try {
-    const toStream = new stream.Readable({objectMode: true});
+  const toStream = new stream.Readable({
+    objectMode: true,
 
-    for (const entry of entries) {
-      toStream.push(JSON.stringify(entry, 2))
-    }
+    read() {
+      if (this.counter === undefined) {
+        this.counter = 0;
+      }
 
-    toStream.push(null);
+      this.push(entries[this.counter]);
 
-    return toStream
-  } catch(e) {
-    console.log("fsStream", e)
-  }
+      if (this.counter === entries.length-1) {
+        this.push(null);
+      }
+
+      this.counter += 1;
+    },
+  });
+
+  return toStream;
 }

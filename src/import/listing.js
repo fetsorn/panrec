@@ -1,103 +1,111 @@
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
-import stream from 'stream';
-import { URLSearchParams } from 'node:url';
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat.js'
-import { digestMessage } from '@fetsorn/csvs-js';
-import crypto from 'crypto';
-dayjs.extend(customParseFormat)
+import fs from "fs";
+import os from "os";
+import path from "path";
+import stream from "stream";
+import { URLSearchParams } from "node:url";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+import { digestMessage } from "@fetsorn/csvs-js";
+import crypto from "crypto";
 
-const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'csvs-'))
+dayjs.extend(customParseFormat);
+
+const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), "csvs-"));
 
 async function parseLine(sourcePath, searchParams, filePath, doHashsum) {
   const filename = sourcePath
-        ? filePath.replace(`${sourcePath}`, '')
-        : filePath;
+    ? filePath.replace(`${sourcePath}`, "")
+    : filePath;
 
-  await fs.promises.appendFile(path.join(tmpdir, 'log'), `${filename}\n`)
+  await fs.promises.appendFile(path.join(tmpdir, "log"), `${filename}\n`);
 
   const entry = {
     _: "file",
     UUID: await digestMessage(filename),
-    filename
-  }
+    filename,
+  };
 
   const fileAbsolutePath = `${sourcePath}/${filename}`;
 
   if (doHashsum) {
-    try {
-      const input = await fs.createReadStream(fileAbsolutePath)
+    const input = await fs.createReadStream(fileAbsolutePath);
 
-      const hash = crypto.createHash('sha256');
+    const hash = crypto.createHash("sha256");
 
-      await stream.promises.pipeline(input, hash);
+    await stream.promises.pipeline(input, hash);
 
-      const hashHex = hash.digest('hex');
+    const hashHex = hash.digest("hex");
 
-      entry.filehash = hashHex
-    } catch(e) {
-      console.error(fileAbsolutePath, e)
-    }
+    entry.filehash = hashHex;
   }
 
   try {
-    const stats = await fs.promises.stat(fileAbsolutePath)
+    const stats = await fs.promises.stat(fileAbsolutePath);
 
-    const date = dayjs(stats.mtime)
-          .format('YYYY-MM-DDTHH:mm:ss')
+    const date = dayjs(stats.mtime).format("YYYY-MM-DDTHH:mm:ss");
 
-    entry.moddate = date
-  } catch(e) {
-    console.error(fileAbsolutePath, e)
+    entry.moddate = date;
+  } catch (e) {
+    console.error(fileAbsolutePath, e);
   }
 
   let matchesQuery = true;
 
-  for (const [key, value] of searchParams.entries()) {
-    matchesQuery = entry[key] == value
-  }
+  searchParams.forEach((value, key) => {
+    matchesQuery = entry[key] === value;
+  });
 
   if (matchesQuery) {
-    return entry
+    return entry;
   }
+
+  return undefined;
 }
 
-export async function parseListing(sourcePath, query, doHashsum) {
+export default async function parseListing(sourcePath, query, doHashsum) {
   const searchParams = new URLSearchParams(query);
 
   return new stream.Transform({
     objectMode: true,
 
     async transform(chunk, encoding, callback) {
-      const content = (this._buffer ?? "") + String(chunk);
+      const content = (this.contentBuffer ?? "") + String(chunk);
 
-      const lines = content.split("\n").filter((l) => l !== '')
+      const lines = content.split("\n").filter((l) => l !== "");
 
-      const tail = content[content.length - 1] === '\n'
-            ? ""
-            : lines.pop();
+      const tail = content[content.length - 1] === "\n" ? "" : lines.pop();
 
-      this._buffer = tail;
+      this.contentBuffer = tail;
 
-      await Promise.all(lines.map(async (line) => {
-        const entry = await parseLine(sourcePath, searchParams, line, doHashsum)
+      await Promise.all(
+        lines.map(async (line) => {
+          const entry = await parseLine(
+            sourcePath,
+            searchParams,
+            line,
+            doHashsum,
+          );
 
-        this.push(entry);
-      }))
+          this.push(entry);
+        }),
+      );
 
       callback();
     },
 
     async final(next) {
-      if (this._buffer) {
-        const entry = await parseLine(sourcePath, searchParams, this._buffer, doHashsum);
+      if (this.contentBuffer) {
+        const entry = await parseLine(
+          sourcePath,
+          searchParams,
+          this.contentBuffer,
+          doHashsum,
+        );
 
-        this.push(JSON.stringify(entry, 2))
+        this.push(JSON.stringify(entry, 2));
       }
 
       next();
-    }
+    },
   });
 }

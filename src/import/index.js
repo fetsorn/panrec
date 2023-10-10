@@ -1,12 +1,12 @@
-import fs from 'fs';
-import stream from 'stream';
-import { readCSVS } from './csvs.js';
-import { parseJSON, parseJSONStream } from './json.js';
-import { parseVK } from './vk.js';
-import { parseTG } from './tg.js';
-import { parseFS } from './fs.js';
-import { parseBiorg } from './biorg.js';
-import { parseListing } from './listing.js';
+import fs from "fs";
+import stream from "stream";
+import readCSVS from "./csvs.js";
+import { parseJSON, parseJSONStream } from "./json.js";
+import parseVK from "./vk.js";
+import parseTG from "./tg.js";
+import parseFS from "./fs.js";
+import parseBiorg from "./biorg.js";
+import parseListing from "./listing.js";
 
 async function isCSVS(sourcePath) {
   try {
@@ -49,11 +49,19 @@ async function isFS(sourcePath) {
 }
 
 async function isBiorg(sourcePath) {
-  return new RegExp(/org$/).test(sourcePath);
+  return /org$/.test(sourcePath);
 }
 
 async function isJSON(sourcePath) {
-  return new RegExp(/json$/).test(sourcePath);
+  return /json$/.test(sourcePath);
+}
+
+async function isJSONStream() {
+  return true;
+}
+
+async function isListing() {
+  return true;
 }
 
 export function passthroughStream() {
@@ -69,7 +77,7 @@ export function passthroughStream() {
     close() {},
 
     abort(err) {
-      console.log('Sink error:', err);
+      console.log("Sink error:", err);
     },
   });
 }
@@ -83,7 +91,7 @@ export async function transformStream(sourcePath, query, doHashsum) {
 
   // if source type is json
   // // pipe stdin stream to parseJson
-  if (true) {
+  if (await isJSONStream(sourcePath)) {
     return parseJSONStream(query);
   }
 
@@ -93,9 +101,11 @@ export async function transformStream(sourcePath, query, doHashsum) {
 
   // if source type is filesystem listing
   // // pipe stdin stream to parseListing
-  if (true) {
+  if (await isListing(sourcePath)) {
     return parseListing(sourcePath, query, doHashsum);
   }
+
+  return undefined;
 }
 
 /**
@@ -138,4 +148,6 @@ export async function importStream(sourcePath, query, doHashsum, stats) {
   if (await isJSON(sourcePath)) {
     return parseJSON(sourcePath, query);
   }
+
+  return undefined;
 }

@@ -1,16 +1,12 @@
-import fs from 'fs';
-import path from 'path';
-
-export function buildStdout() {
+export default function buildStdout() {
   return new WritableStream({
     objectMode: true,
 
-    async write(entry, encoding, next) {
-      console.log(JSON.stringify(entry, 2));
+    async write(entry) {
+      console.log(JSON.stringify(entry));
     },
 
-    close() {
-    },
+    close() {},
 
     abort(err) {
       console.log("Sink error:", err);

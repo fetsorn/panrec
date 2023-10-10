@@ -1,14 +1,14 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export const packageJSON = {
+export default {
   getContent() {
-    const packageJsonPath = path.resolve(__dirname, '../', '../', 'package.json');
+    const packageJsonPath = path.resolve(dirname, "../", "../", "package.json");
     const packageJsonContent = JSON.parse(
-      fs.readFileSync(packageJsonPath, 'utf-8'),
+      fs.readFileSync(packageJsonPath, "utf-8"),
     );
     return packageJsonContent;
   },
@@ -19,7 +19,7 @@ export const packageJSON = {
   get version() {
     const packageJsonContent = this.getContent();
     const { version } = packageJsonContent;
-    return version || '0.0.0';
+    return version || "0.0.0";
   },
 
   /**
@@ -28,6 +28,6 @@ export const packageJSON = {
   get name() {
     const packageJsonContent = this.getContent();
     const { name } = packageJsonContent;
-    return name || '';
+    return name || "";
   },
 };

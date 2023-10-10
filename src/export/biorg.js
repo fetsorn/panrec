@@ -1,19 +1,16 @@
-import fs from 'fs';
-import path from 'path';
-
-export function buildBiorg(targetPath) {
+export default function buildBiorg() {
   function objectToBiorgFormat(entryValue) {
-    if (typeof entryValue !== 'object' || entryValue === null) {
+    if (typeof entryValue !== "object" || entryValue === null) {
       return entryValue;
     }
 
     if (Array.isArray(entryValue)) {
-      return `(${entryValue.map(objectToBiorgFormat).join(' ')})`;
+      return `(${entryValue.map(objectToBiorgFormat).join(" ")})`;
     }
 
     const str = `(${Object.entries(entryValue)
       .map(([key, value]) => `:${key} ${objectToBiorgFormat(value)}`)
-      .join(' ')})`;
+      .join(" ")})`;
 
     return `(${str})`;
   }
@@ -21,26 +18,31 @@ export function buildBiorg(targetPath) {
   return new WritableStream({
     objectMode: true,
 
+    // eslint-disable-next-line no-unused-vars
     async write(entry, encoding, next) {
-      for (const key of Object.keys(entry).filter(key => key !== 'datum')) {
-        entry[key] = objectToBiorgFormat(entry[key]);
-      }
+      const entryNew = entry;
 
-      console.log(`* .`);
-      console.log(`:PROPERTIES:`);
-      for (const [key, value] of Object.entries(entry).filter(
-        ([k, v]) => k !== 'datum'
-      )) {
-        console.log(`:${key}:`, value);
-      }
-      console.log(`:END:`);
+      Object.keys(entry)
+        .filter((key) => key !== "datum")
+        .forEach((key) => {
+          entryNew[key] = objectToBiorgFormat(entry[key]);
+        });
+
+      console.log("* .");
+      console.log(":PROPERTIES:");
+      Object.entries(entry)
+        .filter(([key]) => key !== "datum")
+        .forEach(([key, value]) => {
+          console.log(`:${key}:`, value);
+        });
+      console.log(":END:");
       console.log(entry.datum);
     },
 
     close() {},
 
     abort(err) {
-      console.log('Sink error:', err);
+      console.log("Sink error:", err);
     },
   });
 }
