@@ -12,7 +12,7 @@ export default function buildBiorg() {
       .map(([key, value]) => `:${key} ${objectToBiorgFormat(value)}`)
       .join(" ")})`;
 
-    return `(${str})`;
+    return `${str}`;
   }
 
   return new WritableStream({
