@@ -1,9 +1,9 @@
-import fs from "fs";
-import path from "path";
-import exportCSVS from "./csvs.js";
-import exportStdout from "./stdout.js";
-import exportBiorg from "./biorg.js";
-import exportJson from "./json.js";
+import fs from 'fs';
+import path from 'path';
+import exportCSVS from './csvs.js';
+import exportStdout from './stdout.js';
+import exportBiorg from './biorg.js';
+import exportJson from './json.js';
 
 export default function exportStream(targetPath, targetType, doYank) {
   // if target type is csvs or target path is directory
@@ -12,7 +12,7 @@ export default function exportStream(targetPath, targetType, doYank) {
   // // pass entry to exportCSVS stream, return
   const isCSVS =
     targetPath !== undefined ||
-    targetType === "csvs" ||
+    targetType === 'csvs' ||
     (targetPath && fs.statSync(targetPath).isDirectory());
 
   if (isCSVS) {
@@ -22,12 +22,12 @@ export default function exportStream(targetPath, targetType, doYank) {
   // TODO: unite with output stream
   // if no target type or target type is json
   // // pass json entry to exportJson
-  if (targetPath && targetType === "json") {
+  if (targetPath && targetType === 'json') {
     return exportJson(targetPath);
   }
   // if target type is biorg
   // // pass json entry to exportBiorg stream
-  if (targetType === "biorg") {
+  if (targetType === 'biorg') {
     return exportBiorg(targetPath);
   }
 
