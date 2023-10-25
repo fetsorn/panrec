@@ -1,12 +1,12 @@
-import fs from 'fs';
-import stream from 'stream';
-import readCSVS from './csvs.js';
-import { parseJSON, parseJSONStream } from './json.js';
-import parseVK from './vk.js';
-import parseTG from './tg.js';
-import parseFS from './fs.js';
-import parseBiorg from './biorg.js';
-import parseListing from './listing.js';
+import fs from "fs";
+import stream from "stream";
+import readCSVS from "./csvs.js";
+import { parseJSON, parseJSONStream } from "./json.js";
+import parseVK from "./vk.js";
+import parseTG from "./tg.js";
+import parseFS from "./fs.js";
+import parseBiorg from "./biorg.js";
+import parseListing from "./listing.js";
 
 async function isCSVS(sourcePath) {
   try {
@@ -77,7 +77,7 @@ export function passthroughStream() {
     close() {},
 
     abort(err) {
-      console.log('Sink error:', err);
+      console.log("Sink error:", err);
     },
   });
 }

@@ -106,7 +106,7 @@ export default async function parseFS(sourcePath, query, doHashsum) {
 
       this.push(entries[this.counter]);
 
-      if (this.counter === entries.length-1) {
+      if (this.counter === entries.length - 1) {
         this.push(null);
       }
 

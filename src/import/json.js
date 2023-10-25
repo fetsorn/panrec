@@ -17,7 +17,7 @@ export async function parseJSON(sourcePath) {
 
       this.push(entries[this.counter]);
 
-      if (this.counter === entries.length-1) {
+      if (this.counter === entries.length - 1) {
         this.push(null);
       }
 
