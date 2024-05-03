@@ -5,7 +5,7 @@ export async function parseJSON(sourcePath) {
   const index = await fs.promises.readFile(sourcePath);
 
   // TODO filter query
-  const entries = JSON.parse(index);
+  const records = JSON.parse(index);
 
   const toStream = new stream.Readable({
     objectMode: true,
@@ -15,9 +15,9 @@ export async function parseJSON(sourcePath) {
         this.counter = 0;
       }
 
-      this.push(entries[this.counter]);
+      this.push(records[this.counter]);
 
-      if (this.counter === entries.length - 1) {
+      if (this.counter === records.length - 1) {
         this.push(null);
       }
 

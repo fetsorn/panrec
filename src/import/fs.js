@@ -36,20 +36,18 @@ async function statPath(
         );
       }
 
-      const entry = {
+      const record = {
         _: "datum",
         datum: file,
         files: {
           _: "files",
-          UUID: await digestMessage(await randomUUID()),
-          items: [
-            {
-              _: "file",
-              UUID: await digestMessage(await randomUUID()),
-              filename: fileRelativePath,
-              sourcepath: sourceAbsolutePath,
-            },
-          ],
+          files: await digestMessage(await randomUUID()),
+          file: {
+            _: "file",
+            file: await digestMessage(await randomUUID()),
+            filename: fileRelativePath,
+            sourcepath: sourceAbsolutePath,
+          },
         },
         category: "fs",
       };
@@ -64,7 +62,7 @@ async function statPath(
 
           const hashHex = hash.digest("hex");
 
-          entry.files.items[0].filehash = hashHex;
+          record.files.file.filehash = hashHex;
         } catch (e) {
           console.error(fileAbsolutePath, e);
         }
@@ -72,16 +70,16 @@ async function statPath(
 
       const date = dayjs(stats.mtime).format("YYYY-MM-DDTHH:mm:ss");
 
-      entry.actdate = date;
+      record.actdate = date;
 
       let matchesQuery = true;
 
       searchParams.forEach((value, key) => {
-        matchesQuery = entry[key] === value;
+        matchesQuery = record[key] === value;
       });
 
       if (matchesQuery) {
-        return entry;
+        return record;
       }
 
       return undefined;
@@ -92,7 +90,7 @@ async function statPath(
 export default async function parseFS(sourcePath, query, doHashsum) {
   const searchParams = new URLSearchParams(query);
 
-  const entries = (
+  const records = (
     await statPath(sourcePath, "", searchParams, doHashsum)
   ).flat();
 
@@ -104,9 +102,9 @@ export default async function parseFS(sourcePath, query, doHashsum) {
         this.counter = 0;
       }
 
-      this.push(entries[this.counter]);
+      this.push(records[this.counter]);
 
-      if (this.counter === entries.length - 1) {
+      if (this.counter === records.length - 1) {
         this.push(null);
       }
 

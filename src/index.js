@@ -50,7 +50,7 @@ const pipeline = util.promisify(stream.pipeline);
           exportStream(options.targetPath, options.targetType, options.yank),
         );
       } catch (e) {
-        console.log("pipeline", e);
+        console.error("pipeline error", e);
       }
     });
 

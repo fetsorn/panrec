@@ -54,82 +54,84 @@ function convertToObject(arr) {
 
 async function parseOrgmode(sourcePath) {
   return new Promise((res) => {
-    const entries = [];
+    const records = [];
 
     org.makelist(sourcePath, async (nl) => {
       nl.forEach((el) => {
-        const entry = {};
+        const record = {};
 
-        entry._ = "datum";
+        record._ = el.properties._;
 
-        const datumValue = el.body.trim();
+        const valueBody = el.body.trim();
 
-        entry.datum = datumValue;
+        record[record._] = valueBody;
 
         Object.keys(el.properties).forEach((key) => {
           if (Object.prototype.hasOwnProperty.call(el.properties, key)) {
-            const value = el.properties[key];
+            const valueProperty = el.properties[key];
 
-            if (value.startsWith("(:")) {
-              entry[key] = convertToObject(astFromArray(tokenize(value)));
+            if (valueProperty.startsWith("(:")) {
+              record[key] = convertToObject(
+                astFromArray(tokenize(valueProperty)),
+              );
             } else {
-              entry[key] = value;
+              record[key] = valueProperty;
             }
           }
         });
 
-        entries.push(entry);
+        records.push(record);
       });
 
-      res(entries);
+      res(records);
     });
   });
 }
 
-function printTree(entries, depth = 0, prefix = "") {
+function printTree(records, depth = 0, prefix = "") {
   if (depth === 0) {
-    console.log(`${prefix}datum`);
+    console.log(`${prefix}$_`);
   }
 
   let keys = [];
 
-  let entry = {};
+  let record = {};
 
-  if (Array.isArray(entries)) {
-    entries.forEach((e) => {
-      if (Object.keys(e).length > Object.keys(entry).length) entry = e;
+  if (Array.isArray(records)) {
+    records.forEach((e) => {
+      if (Object.keys(e).length > Object.keys(record).length) record = e;
     });
-    keys = Object.keys(entry);
+    keys = Object.keys(record);
   } else {
-    entry = entries;
+    record = records;
 
-    keys = Object.keys(entries);
+    keys = Object.keys(records);
   }
 
   keys.forEach((key) => {
-    if (key !== "_" && key !== "datum") {
+    if (key !== "_" && key !== [records._]) {
       const indent = "  ".repeat(depth + 1);
 
-      if (key.toLowerCase() !== "uuid") {
+      if (key.toLowerCase() !== records._) {
         console.log(`${prefix + indent}|- ${key}`);
       }
 
       if (
-        typeof entry[key] === "object" &&
-        Object.keys(entry[key]).length > 0
+        typeof record[key] === "object" &&
+        Object.keys(record[key]).length > 0
       ) {
-        printTree(entry[key], depth + 1);
+        printTree(record[key], depth + 1);
       }
     }
   });
 }
 
 async function biorgStats(sourcePath) {
-  const entries = await parseOrgmode(sourcePath);
+  const records = await parseOrgmode(sourcePath);
 
-  console.log(`entries: ${entries.length}`);
+  console.log(`records: ${records.length}`);
 
-  printTree(entries);
+  printTree(records);
 
   const toStream = new stream.Readable({ objectMode: true });
 
@@ -143,7 +145,7 @@ export default async function parseBiorg(sourcePath, query, stats) {
     return biorgStats(sourcePath);
   }
 
-  const entries = await parseOrgmode(sourcePath, false);
+  const records = await parseOrgmode(sourcePath, false);
 
   const toStream = new stream.Readable({
     objectMode: true,
@@ -152,9 +154,9 @@ export default async function parseBiorg(sourcePath, query, stats) {
         this.counter = 0;
       }
 
-      this.push(entries[this.counter]);
+      this.push(records[this.counter]);
 
-      if (this.counter === entries.length - 1) {
+      if (this.counter === records.length - 1) {
         this.push(null);
       }
 

@@ -19,9 +19,9 @@ async function parseLine(sourcePath, searchParams, filePath, doHashsum) {
 
   await fs.promises.appendFile(path.join(tmpdir, "log"), `${filename}\n`);
 
-  const entry = {
+  const record = {
     _: "file",
-    UUID: await digestMessage(filename),
+    file: await digestMessage(filename),
     filename,
   };
 
@@ -36,7 +36,7 @@ async function parseLine(sourcePath, searchParams, filePath, doHashsum) {
 
     const hashHex = hash.digest("hex");
 
-    entry.filehash = hashHex;
+    record.filehash = hashHex;
   }
 
   try {
@@ -44,7 +44,7 @@ async function parseLine(sourcePath, searchParams, filePath, doHashsum) {
 
     const date = dayjs(stats.mtime).format("YYYY-MM-DDTHH:mm:ss");
 
-    entry.moddate = date;
+    record.moddate = date;
   } catch (e) {
     console.error(fileAbsolutePath, e);
   }
@@ -52,11 +52,11 @@ async function parseLine(sourcePath, searchParams, filePath, doHashsum) {
   let matchesQuery = true;
 
   searchParams.forEach((value, key) => {
-    matchesQuery = entry[key] === value;
+    matchesQuery = record[key] === value;
   });
 
   if (matchesQuery) {
-    return entry;
+    return record;
   }
 
   return undefined;
@@ -79,14 +79,14 @@ export default async function parseListing(sourcePath, query, doHashsum) {
 
       await Promise.all(
         lines.map(async (line) => {
-          const entry = await parseLine(
+          const record = await parseLine(
             sourcePath,
             searchParams,
             line,
             doHashsum,
           );
 
-          this.push(entry);
+          this.push(record);
         }),
       );
 
@@ -95,14 +95,14 @@ export default async function parseListing(sourcePath, query, doHashsum) {
 
     async final(next) {
       if (this.contentBuffer) {
-        const entry = await parseLine(
+        const record = await parseLine(
           sourcePath,
           searchParams,
           this.contentBuffer,
           doHashsum,
         );
 
-        this.push(JSON.stringify(entry, 2));
+        this.push(JSON.stringify(record, 2));
       }
 
       next();

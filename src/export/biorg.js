@@ -23,7 +23,7 @@ export default function buildBiorg() {
       const entryNew = entry;
 
       Object.keys(entry)
-        .filter((key) => key !== "datum")
+        .filter((key) => key !== entry._)
         .forEach((key) => {
           entryNew[key] = objectToBiorgFormat(entry[key]);
         });
@@ -31,12 +31,12 @@ export default function buildBiorg() {
       console.log("* .");
       console.log(":PROPERTIES:");
       Object.entries(entry)
-        .filter(([key]) => key !== "datum")
+        .filter(([key]) => key !== entry._)
         .forEach(([key, value]) => {
           console.log(`:${key}:`, value);
         });
       console.log(":END:");
-      console.log(entry.datum);
+      console.log(entry[entry._]);
     },
 
     close() {},

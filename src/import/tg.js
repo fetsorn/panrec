@@ -35,7 +35,7 @@ function parseMessage(query, partnerID, partnerName, message) {
 
   const content = text + phoneCall;
 
-  const entry = {
+  const record = {
     _: "datum",
     datum: content,
     actdate: date,
@@ -49,11 +49,11 @@ function parseMessage(query, partnerID, partnerName, message) {
   const isOutcoming = senderID.replace(/^user/, "") === partnerID;
 
   if (isOutcoming) {
-    entry.actname = nameOutcoming;
-    entry.sayname = partnerName;
+    record.actname = nameOutcoming;
+    record.sayname = partnerName;
   } else {
-    entry.sayname = nameOutcoming;
-    entry.actname = partnerName;
+    record.sayname = nameOutcoming;
+    record.actname = partnerName;
   }
 
   const searchParams = new URLSearchParams(query);
@@ -61,11 +61,11 @@ function parseMessage(query, partnerID, partnerName, message) {
   let matchesQuery = true;
 
   searchParams.forEach((value, key) => {
-    matchesQuery = entry[key] === value;
+    matchesQuery = record[key] === value;
   });
 
   if (matchesQuery) {
-    return entry;
+    return record;
   }
 
   return undefined;
@@ -78,7 +78,7 @@ export default async function parseTG(sourcePath, query) {
 
   const { id: partnerID, name: partnerName, messages } = index;
 
-  const entries = messages
+  const records = messages
     .map((message) => parseMessage(query, partnerID, partnerName, message))
     .filter(Boolean)
     .flat();
@@ -91,9 +91,9 @@ export default async function parseTG(sourcePath, query) {
         this.counter = 0;
       }
 
-      this.push(entries[this.counter]);
+      this.push(records[this.counter]);
 
-      if (this.counter === entries.length - 1) {
+      if (this.counter === records.length - 1) {
         this.push(null);
       }
 

@@ -8,7 +8,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js";
 
 dayjs.extend(customParseFormat);
 
-// async function entry() {
+// async function record() {
 //   const index = await fs.promises.readFile(sourcePath, { encoding: "utf8" });
 
 //   const wrap = parse(index).childNodes[1].childNodes[2].childNodes[1];
@@ -87,7 +87,7 @@ function parseMessage(item) {
   };
 }
 
-function messageEntry(query, name, message) {
+function messageRecord(query, name, message) {
   const {
     // dataId,
     date,
@@ -95,7 +95,7 @@ function messageEntry(query, name, message) {
     content,
   } = parseMessage(message);
 
-  const entry = {
+  const record = {
     _: "datum",
     datum: content,
     actdate: date,
@@ -105,11 +105,11 @@ function messageEntry(query, name, message) {
   const nameOutcoming = "you";
 
   if (isOutcoming) {
-    entry.actname = nameOutcoming;
-    entry.sayname = name;
+    record.actname = nameOutcoming;
+    record.sayname = name;
   } else {
-    entry.sayname = nameOutcoming;
-    entry.actname = name;
+    record.sayname = nameOutcoming;
+    record.actname = name;
   }
 
   const searchParams = new URLSearchParams(query);
@@ -117,17 +117,17 @@ function messageEntry(query, name, message) {
   let matchesQuery = true;
 
   searchParams.forEach((value, key) => {
-    matchesQuery = entry[key] === value;
+    matchesQuery = record[key] === value;
   });
 
   if (matchesQuery) {
-    return entry;
+    return record;
   }
 
   return undefined;
 }
 
-async function messageFileEntries(query, name, messagesDir, messagesFile) {
+async function messageFileRecords(query, name, messagesDir, messagesFile) {
   const messagesPath = `${messagesDir}/${messagesFile}`;
 
   const messagesContents = await fs.promises.readFile(messagesPath);
@@ -142,25 +142,25 @@ async function messageFileEntries(query, name, messagesDir, messagesFile) {
     (n) => n.nodeName === "div" && n.attrs[0].value !== "pagination clear_fix",
   );
 
-  return messages.map((message) => messageEntry(query, name, message));
+  return messages.map((message) => messageRecord(query, name, message));
 }
 
-async function senderEntries(sourcePath, query, sender) {
+async function senderRecords(sourcePath, query, sender) {
   const [id, name] = parseSender(sender);
 
   const messagesDir = `${sourcePath}/messages/${id}`;
 
   const messagesFiles = await fs.promises.readdir(messagesDir);
 
-  const entries = await Promise.all(
+  const records = await Promise.all(
     messagesFiles
       .filter((f) => f !== ".DS_Store")
       .map(async (messagesFile) =>
-        messageFileEntries(query, name, messagesDir, messagesFile),
+        messageFileRecords(query, name, messagesDir, messagesFile),
       ),
   );
 
-  return entries.flat();
+  return records.flat();
 }
 
 export default async function parseVK(sourcePath, query) {
@@ -178,9 +178,9 @@ export default async function parseVK(sourcePath, query) {
     (n) => n.nodeName === "div",
   );
 
-  const entries = (
+  const records = (
     await Promise.all(
-      senders.map(async (sender) => senderEntries(sourcePath, query, sender)),
+      senders.map(async (sender) => senderRecords(sourcePath, query, sender)),
     )
   ).flat();
 
@@ -192,9 +192,9 @@ export default async function parseVK(sourcePath, query) {
         this.counter = 0;
       }
 
-      this.push(entries[this.counter]);
+      this.push(records[this.counter]);
 
-      if (this.counter === entries.length - 1) {
+      if (this.counter === records.length - 1) {
         this.push(null);
       }
 

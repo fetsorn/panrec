@@ -33,6 +33,13 @@ async function addLFS({ fs: fsVirt, dir, filepath }) {
 }
 
 export default function writeCSVS(targetPath, doYank) {
+  // create .csvs.csv in targetPath if there is none
+  try {
+    fs.readFileSync(`${targetPath}/.csvs.csv`);
+  } catch {
+    fs.writeFileSync(`${targetPath}/.csvs.csv`, "csvs,0.0.2");
+  }
+
   async function readFile(filepath) {
     const realpath = path.join(targetPath, filepath);
 
@@ -113,9 +120,9 @@ export default function writeCSVS(targetPath, doYank) {
       await csvs.update(entry);
 
       if (doYank) {
-        if (entry.files.items[0]) {
+        if (entry.files.file[0]) {
           try {
-            const { sourcepath, filename, filehash } = entry.files.items[0];
+            const { sourcepath, filename, filehash } = entry.files.file[0];
 
             const filepath = path.join("lfs", filehash);
 

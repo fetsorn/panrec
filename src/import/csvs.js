@@ -100,9 +100,9 @@ async function csvsStats(sourcePath, query) {
     grep: grepCallback,
   });
 
-  const entries = await csvs.select(searchParams);
+  const records = await csvs.select(searchParams);
 
-  console.log(`entries: ${entries.length}`);
+  console.log(`records: ${records.length}`);
 
   const size = await dirSize(`${sourcePath}/metadir`);
 
@@ -161,6 +161,32 @@ export default async function readCSVS(sourcePath, query, stats) {
       fetchCallback(path.join(sourcePath, filepath)),
     grep: grepCallback,
   });
+
+  // if base is undefined, find first root
+  if (searchParams.get("_") === null) {
+    const [schemaRecord] = await csvs.select(new URLSearchParams("_=_"));
+
+    // { leaf: trunk, root: undefined }
+    const schema = Object.keys(schemaRecord)
+      .filter((key) => key !== "_")
+      .reduce(
+        (accTrunk, trunk) => ({
+          ...accTrunk,
+          ...schemaRecord[trunk].reduce(
+            (accLeaf, leaf) => ({ ...accLeaf, [leaf]: trunk }),
+            { [trunk]: undefined, ...accTrunk },
+          ),
+        }),
+        {},
+      );
+
+    // find first branch that has no trunk
+    const baseDefault = Object.keys(schema)
+      .filter((key) => key !== "branch")
+      .find((key) => schema[key] === undefined);
+
+    searchParams.set("_", baseDefault);
+  }
 
   const queryStream = await csvs.selectStream(searchParams);
 

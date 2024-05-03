@@ -39,10 +39,12 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.51.0.tgz#6d419c240cfb2b66da37df230f7e7eef801c32fa"
   integrity sha512-HxjQ8Qn+4SI3/AFv6sOrDB+g6PpUTDwSJiQqOrnneEk8L71161srI9gjzzZvYVbzHiVg/BvcH95+cK/zfIt4pg==
 
-"@fetsorn/csvs-js@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@fetsorn/csvs-js/-/csvs-js-0.13.0.tgz#21d06e13e631a632affd6eb7dcb0eeb7d575d23d"
-  integrity sha512-OsEtLo5+Xs1F571nuQj6ZtVUHTI2XC7m+sfviqJbNrbP8KS1dTwo1KTALb6a7DdPBcCHs3QUVs+NqDORmq61Mg==
+"@fetsorn/csvs-js@^0.16.5":
+  version "0.16.5"
+  resolved "https://registry.yarnpkg.com/@fetsorn/csvs-js/-/csvs-js-0.16.5.tgz#fcfa193bbc2d8f6be20233b5f2983772424b32cd"
+  integrity sha512-q+Ze7fQhRHoXBH0HLYUJ0fP7vPBPmGb5tMDD6JDr6bze2OMDYkg1J0VLYatZvk3sMRZ3E9oFErMytWjKpeABFw==
+  dependencies:
+    papaparse "^5.4.1"
 
 "@fetsorn/isogit-lfs@^0.4.0":
   version "0.4.0"
@@ -1509,6 +1511,11 @@ pako@^1.0.10:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.11.tgz#6c9599d340d54dfd3946380252a35705a6b992bf"
   integrity sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==
+
+papaparse@^5.4.1:
+  version "5.4.1"
+  resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-5.4.1.tgz#f45c0f871853578bd3a30f92d96fdcfb6ebea127"
+  integrity sha512-HipMsgJkZu8br23pW15uvo6sib6wne/4woLZPlFf3rpDyMe9ywEXUsuD7+6K9PRkJlVT51j/sCOYDKGGS3ZJrw==
 
 parent-module@^1.0.0:
   version "1.0.1"

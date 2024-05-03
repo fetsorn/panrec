@@ -14,8 +14,18 @@ async function isCSVS(sourcePath) {
 
     return true;
   } catch {
-    return false;
+    //
   }
+
+  try {
+    await fs.promises.readFile(`${sourcePath}/.csvs.csv`);
+
+    return true;
+  } catch {
+    //
+  }
+
+  return false;
 }
 
 async function isVK(sourcePath) {
@@ -68,8 +78,8 @@ export function passthroughStream() {
   return new stream.Transform({
     objectMode: true,
 
-    async write(entry, encoding, next) {
-      this.push(entry);
+    async write(record, encoding, next) {
+      this.push(record);
 
       next();
     },
