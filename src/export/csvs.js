@@ -2,6 +2,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { CSVS } from "@fetsorn/csvs-js";
+import { WritableStream } from "node:stream/web";
 
 async function addLFS({ fs: fsVirt, dir, filepath }) {
   const fileBlob = await fsVirt.promises.readFile(path.join(dir, filepath));

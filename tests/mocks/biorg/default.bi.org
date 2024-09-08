@@ -1,0 +1,12 @@
+
+* .
+:PROPERTIES:
+:_: datum
+:filepath: (:_ filepath :filepath path/to/1 :moddate 2001-01-01)
+:saydate: 2001-01-01
+:sayname: name1
+:actdate: 2001-01-01
+:actname: name1
+:END:
+value1
+"/""V""o""l""u""m""e""s""/""m""m""/""c""o""d""e""s""/""c""s""v""s""-""n""o""d""e""j""s""/""t""e""s""t""s""/""m""o""c""k""s""/""b""i""o""r""g""/""d""e""f""a""u""l""t"".""b""i"".""o""r""g""/""V""o""l""u""m""e""s""/""m""m""/""c""o""d""e""s""/""c""s""v""s""-""n""o""d""e""j""s""/""t""e""s""t""s""/""m""o""c""k""s""/""b""i""o""r""g""/""d""e""f""a""u""l""t"".""b""i"".""o""r""g""/""V""o""l""u""m""e""s""/""m""m""/""c""o""d""e""s""/""c""s""v""s""-""n""o""d""e""j""s""/""t""e""s""t""s""/""m""o""c""k""s""/""b""i""o""r""g""/""d""e""f""a""u""l""t"".""b""i"".""o""r""g""/""V""o""l""u""m""e""s""/""m""m""/""c""o""d""e""s""/""c""s""v""s""-""n""o""d""e""j""s""/""t""e""s""t""s""/""m""o""c""k""s""/""b""i""o""r""g""/""d""e""f""a""u""l""t"".""b""i"".""o""r""g"

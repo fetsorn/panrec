@@ -1,4 +1,5 @@
 import fs from "fs";
+import { WritableStream } from "node:stream/web";
 
 export default function buildJson(targetPath) {
   return new WritableStream({

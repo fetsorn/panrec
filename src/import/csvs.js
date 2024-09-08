@@ -163,7 +163,10 @@ export default async function readCSVS(sourcePath, query, stats) {
   });
 
   // if base is undefined, find first root
-  if (searchParams.get("_") === null && await csvs.detectVersion() === "0.0.2") {
+  if (
+    searchParams.get("_") === null &&
+    (await csvs.detectVersion()) === "0.0.2"
+  ) {
     // TODO this is specific to csvs 2, csvs 1 finds its own default base
     const [schemaRecord] = await csvs.select(new URLSearchParams("_=_"));
 

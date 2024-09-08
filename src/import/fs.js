@@ -5,7 +5,6 @@ import crypto from "crypto";
 import { URLSearchParams } from "node:url";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
-import { digestMessage, randomUUID } from "@fetsorn/csvs-js";
 
 dayjs.extend(customParseFormat);
 
@@ -37,19 +36,9 @@ async function statPath(
       }
 
       const record = {
-        _: "datum",
-        datum: file,
-        files: {
-          _: "files",
-          files: await digestMessage(await randomUUID()),
-          file: {
-            _: "file",
-            file: await digestMessage(await randomUUID()),
-            filename: fileRelativePath,
-            sourcepath: sourceAbsolutePath,
-          },
-        },
-        category: "fs",
+        _: "filepath",
+        filepath: fileRelativePath,
+        sourcepath: sourceAbsolutePath,
       };
 
       if (doHashsum) {
@@ -62,15 +51,15 @@ async function statPath(
 
           const hashHex = hash.digest("hex");
 
-          record.files.file.filehash = hashHex;
+          record.filehash = hashHex;
         } catch (e) {
           console.error(fileAbsolutePath, e);
         }
       }
 
-      const date = dayjs(stats.mtime).format("YYYY-MM-DDTHH:mm:ss");
+      const moddate = dayjs(stats.mtime).format("YYYY-MM-DDTHH:mm:ss");
 
-      record.actdate = date;
+      record.moddate = moddate;
 
       let matchesQuery = true;
 

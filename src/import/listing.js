@@ -20,12 +20,11 @@ async function parseLine(sourcePath, searchParams, filePath, doHashsum) {
   await fs.promises.appendFile(path.join(tmpdir, "log"), `${filename}\n`);
 
   const record = {
-    _: "file",
-    file: await digestMessage(filename),
-    filename,
+    _: "filepath",
+    filepath: filename,
   };
 
-  const fileAbsolutePath = `${sourcePath}/${filename}`;
+  const fileAbsolutePath = path.join(sourcePath, filename);
 
   if (doHashsum) {
     const input = await fs.createReadStream(fileAbsolutePath);
@@ -45,6 +44,8 @@ async function parseLine(sourcePath, searchParams, filePath, doHashsum) {
     const date = dayjs(stats.mtime).format("YYYY-MM-DDTHH:mm:ss");
 
     record.moddate = date;
+
+    record.filesize = JSON.stringify(stats.size);
   } catch (e) {
     console.error(fileAbsolutePath, e);
   }
@@ -69,6 +70,7 @@ export default async function parseListing(sourcePath, query, doHashsum) {
     objectMode: true,
 
     async transform(chunk, encoding, callback) {
+      console.log(chunk);
       const content = (this.contentBuffer ?? "") + String(chunk);
 
       const lines = content.split("\n").filter((l) => l !== "");

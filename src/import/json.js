@@ -7,23 +7,7 @@ export async function parseJSON(sourcePath) {
   // TODO filter query
   const records = JSON.parse(index);
 
-  const toStream = new stream.Readable({
-    objectMode: true,
-
-    read() {
-      if (this.counter === undefined) {
-        this.counter = 0;
-      }
-
-      this.push(records[this.counter]);
-
-      if (this.counter === records.length - 1) {
-        this.push(null);
-      }
-
-      this.counter += 1;
-    },
-  });
+  const toStream = stream.Readable.from(records);
 
   return toStream;
 }

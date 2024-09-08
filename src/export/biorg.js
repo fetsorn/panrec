@@ -1,3 +1,5 @@
+import { WritableStream } from "node:stream/web";
+
 export default function buildBiorg() {
   function objectToBiorgFormat(entryValue) {
     if (typeof entryValue !== "object" || entryValue === null) {

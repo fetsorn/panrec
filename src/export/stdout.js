@@ -1,3 +1,5 @@
+import { WritableStream } from "node:stream/web";
+
 export default function buildStdout() {
   return new WritableStream({
     objectMode: true,
