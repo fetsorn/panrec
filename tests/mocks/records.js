@@ -1,7 +1,14 @@
 const record2001 = {
-  _: "datum",
+  _: "event",
+  event: "event1",
   datum: "value1",
-  filepath: { _: "filepath", filepath: "path/to/1", moddate: "2001-01-01" },
+  file: {
+    _: "file",
+    file: "file1",
+    filename: "path/to/1",
+    fileext: "jpg",
+    moddate: "2001-01-01",
+  },
   saydate: "2001-01-01",
   sayname: "name1",
   actdate: "2001-01-01",
@@ -9,284 +16,29 @@ const record2001 = {
 };
 
 const record2002 = {
-  _: "datum",
+  _: "event",
+  event: "event2",
   datum: "value2",
-  filepath: { _: "filepath", filepath: "path/to/2", moddate: "2002-01-01" },
+  file: {
+    _: "file",
+    file: "file2",
+    filename: "path/to/2",
+    moddate: "2002-01-01",
+  },
   saydate: "2002-01-01",
   sayname: "name2",
   actdate: "2002-01-01",
   actname: "name2",
 };
 
-const record2003Unedited = {
-  _: "datum",
+const record2003 = {
+  _: "event",
+  event: "event3",
   datum: "",
   saydate: "2003-01-01",
   sayname: "name3",
   actdate: "2003-01-01",
   actname: "name3",
-};
-
-const record2003Edited = {
-  _: "datum",
-  datum: "value3",
-  filepath: "path/to/3",
-  saydate: "2003-03-01",
-  sayname: "name3",
-  actdate: "2003-01-01",
-  actname: "name3",
-};
-
-const recordAdded = {
-  _: "datum",
-  datum: "value4",
-  saydate: "2004-01-01",
-  sayname: "name4",
-  actdate: "2005-01-01",
-  actname: "name5",
-};
-
-const recordArray = {
-  _: "datum",
-  datum: "value1",
-  actdate: "2001-01-01",
-  actname: "name1",
-  export_tags: {
-    _: "export_tags",
-    export_tags:
-      "9bd029a8136649623e645a70938b4dc00e6d1c640a5293425e5eee82a8a21f7f",
-    export1_tag: [
-      {
-        _: "export1_tag",
-        export1_tag:
-          "1c42c99eab4eba24719bf22ae9f2132e914679f4503d1b22652aa515c0bace42",
-        export1_channel: "https://channel1.url",
-        export1_key: "longkey1",
-      },
-      {
-        _: "export1_tag",
-        export1_tag:
-          "fcd10e054b600a2ace70c0cf9d9ebf11c4df86c4ed029000f509d6ebaf473d77",
-        export1_channel: "https://channel2.url",
-        export1_key: "longkey2",
-      },
-    ],
-    export2_tag: {
-      _: "export2_tag",
-      export2_tag:
-        "de0bb32caddc0c5685f46b54ed3409649a48643b90e7a3d27980ed2d017be579",
-      export2_username: "username",
-      export2_password: "password",
-    },
-  },
-};
-
-const recordArrayAdded = {
-  _: "datum",
-  datum: "value2",
-  actdate: "2002-01-01",
-  actname: "name2",
-  export_tags: {
-    _: "export_tags",
-    export_tags:
-      "20b08f6b4c89ed92fa865b00b4ab8b8d4d09ae8ae8e2a400ddff841da8137e49",
-    export1_tag: [
-      {
-        _: "export1_tag",
-        export1_tag:
-          "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
-        export1_channel: "https://channel2.url",
-        export1_key: "longkey2",
-      },
-    ],
-  },
-};
-
-const recordAddedArrayItem = {
-  _: "datum",
-  datum: "value1",
-  actdate: "2001-01-01",
-  actname: "name1",
-  export_tags: {
-    _: "export_tags",
-    export_tags:
-      "9bd029a8136649623e645a70938b4dc00e6d1c640a5293425e5eee82a8a21f7f",
-    export1_tag: [
-      {
-        _: "export1_tag",
-        export1_tag:
-          "1c42c99eab4eba24719bf22ae9f2132e914679f4503d1b22652aa515c0bace42",
-        export1_channel: "https://channel1.url",
-        export1_key: "longkey1",
-      },
-      {
-        _: "export1_tag",
-        export1_tag:
-          "fcd10e054b600a2ace70c0cf9d9ebf11c4df86c4ed029000f509d6ebaf473d77",
-        export1_channel: "https://channel2.url",
-        export1_key: "longkey2",
-      },
-    ],
-    export2_tag: [
-      {
-        _: "export2_tag",
-        export2_tag:
-          "de0bb32caddc0c5685f46b54ed3409649a48643b90e7a3d27980ed2d017be579",
-        export2_username: "username",
-        export2_password: "password",
-      },
-      {
-        _: "export2_tag",
-        export2_tag:
-          "20b08f6b4c89ed92fa865b00b4ab8b8d4d09ae8ae8e2a400ddff841da8137e49",
-        export2_username: "username2",
-        export2_password: "password2",
-      },
-    ],
-  },
-};
-
-const recordEditedArrayItem = {
-  _: "datum",
-  datum: "value1",
-  actdate: "2001-01-01",
-  actname: "name1",
-  export_tags: {
-    _: "export_tags",
-    export_tags:
-      "9bd029a8136649623e645a70938b4dc00e6d1c640a5293425e5eee82a8a21f7f",
-    export1_tag: [
-      {
-        _: "export1_tag",
-        export1_tag:
-          "1c42c99eab4eba24719bf22ae9f2132e914679f4503d1b22652aa515c0bace42",
-        export1_channel: "https://channel1.url",
-        export1_key: "longkey3",
-      },
-      {
-        _: "export1_tag",
-        export1_tag:
-          "fcd10e054b600a2ace70c0cf9d9ebf11c4df86c4ed029000f509d6ebaf473d77",
-        export1_channel: "https://channel2.url",
-        export1_key: "longkey2",
-      },
-    ],
-    export2_tag: {
-      _: "export2_tag",
-      export2_tag:
-        "de0bb32caddc0c5685f46b54ed3409649a48643b90e7a3d27980ed2d017be579",
-      export2_username: "username",
-      export2_password: "password",
-    },
-  },
-};
-
-const recordDeletedArrayItem = {
-  _: "datum",
-  datum: "value1",
-  actdate: "2001-01-01",
-  actname: "name1",
-  export_tags: {
-    _: "export_tags",
-    export_tags:
-      "9bd029a8136649623e645a70938b4dc00e6d1c640a5293425e5eee82a8a21f7f",
-    export1_tag: [
-      {
-        _: "export1_tag",
-        export1_tag:
-          "1c42c99eab4eba24719bf22ae9f2132e914679f4503d1b22652aa515c0bace42",
-        export1_channel: "https://channel1.url",
-        export1_key: "longkey1",
-      },
-    ],
-    export2_tag: {
-      _: "export2_tag",
-      export2_tag:
-        "de0bb32caddc0c5685f46b54ed3409649a48643b90e7a3d27980ed2d017be579",
-      export2_username: "username",
-      export2_password: "password",
-    },
-  },
-};
-
-const recordEditedArrayItemObject = {
-  _: "datum",
-  datum: "value1",
-  actdate: "2001-01-01",
-  actname: "name1",
-  export_tags: {
-    _: "export_tags",
-    export_tags:
-      "9bd029a8136649623e645a70938b4dc00e6d1c640a5293425e5eee82a8a21f7f",
-    export1_tag: [
-      {
-        _: "export1_tag",
-        export1_tag:
-          "1c42c99eab4eba24719bf22ae9f2132e914679f4503d1b22652aa515c0bace42",
-        export1_channel: "https://channel1.url",
-        export1_key: "longkey1",
-      },
-      {
-        _: "export1_tag",
-        export1_tag:
-          "fcd10e054b600a2ace70c0cf9d9ebf11c4df86c4ed029000f509d6ebaf473d77",
-        export1_channel: "https://channel2.url",
-        export1_key: "longkey2",
-      },
-    ],
-    export2_tag: {
-      _: "export2_tag",
-      export2_tag:
-        "de0bb32caddc0c5685f46b54ed3409649a48643b90e7a3d27980ed2d017be579",
-      export2_username: "username",
-      export2_password: "password",
-      export2_tag_description: {
-        _: "export2_tag_description",
-        export2_tag_description:
-          "20b08f6b4c89ed92fa865b00b4ab8b8d4d09ae8ae8e2a400ddff841da8137e49",
-        export2_tag_description_text1: "text1",
-        export2_tag_description_text2: "text2",
-      },
-    },
-  },
-};
-
-const recordArrayLiteral = {
-  _: "datum",
-  datum: "value1",
-  filepath: { _: "filepath", filepath: "path/to/1", moddate: "2001-01-01" },
-  saydate: "2001-01-01",
-  sayname: ["name1", "name2"],
-  actdate: "2001-01-01",
-  actname: "name1",
-};
-
-const recordExport1Tag = {
-  _: "export1_tag",
-  export1_tag:
-    "1c42c99eab4eba24719bf22ae9f2132e914679f4503d1b22652aa515c0bace42",
-  export1_channel: "https://channel1.url",
-  export1_key: "longkey1",
-};
-
-const recordSchema = {
-  _: "_",
-  datum: [
-    "actdate",
-    "actname",
-    "saydate",
-    "sayname",
-    "privacy",
-    "tag",
-    "filepath",
-  ],
-  filepath: ["moddate", "filehash", "filetype", "filesize", "pathrule"],
-};
-
-const record2001Filepath = {
-  _: "filepath",
-  filepath: "path/to/1",
-  moddate: "2001-01-01",
 };
 
 const recordFile = {
@@ -304,22 +56,165 @@ const recordFileListing = {
   moddate: "2024-09-09T00:56:34",
 };
 
+const recordsPedigree = [
+  {
+    _: "_",
+    branch: ["cognate", "description_en", "description_ru", "task", "trunk"],
+    event: ["actdate", "actname", "category", "datum", "saydate", "sayname"],
+    person: "parent",
+  },
+  { _: "branch", branch: "actname", cognate: "person" },
+  { _: "branch", branch: "sayname", cognate: "person" },
+  { _: "branch", branch: "person", cognate: "parent" },
+  {
+    _: "event",
+    actname: "Victoria_Hanover_57192892",
+    actdate: "1819-05-24",
+    category: "birth",
+    datum: "Kensington,Palace,London,England",
+  },
+  {
+    _: "event",
+    actname: "Victoria_Hanover_57192892",
+    actdate: "1901-01-22",
+    category: "death",
+    datum: "Osborne House,Isle of Wight,England",
+  },
+  {
+    _: "event",
+    actname: "Albert_Augustus_Charles_58195837",
+    actdate: "1819-08-26",
+    category: "birth",
+    datum: "Schloss Rosenau,Near Coburg,Germany",
+  },
+  {
+    _: "event",
+    actname: "Albert_Augustus_Charles_58195837",
+    actdate: "1861-12-14",
+    category: "death",
+    datum: "Windsor Castle,Berkshire,England",
+  },
+  {
+    _: "event",
+    actname: "Victoria_Adelaide_Mary_91581920",
+    actdate: "1840-11-21",
+    category: "birth",
+    datum: "Buckingham,Palace,London,England",
+  },
+  {
+    _: "event",
+    actname: "Victoria_Adelaide_Mary_91581920",
+    actdate: "1901-08-05",
+    category: "death",
+    datum: "Friedrichshof,Near,Kronberg,Taunus",
+  },
+  {
+    _: "event",
+    actname: "Edward_VII_Wettin_85157273",
+    actdate: "1841-11-09",
+    category: "birth",
+    datum: "Buckingham,Palace,London,England",
+  },
+  {
+    _: "event",
+    actname: "Edward_VII_Wettin_85157273",
+    actdate: "1910-05-06",
+    category: "death",
+    datum: "Buckingham,Palace,London,England",
+  },
+  {
+    _: "event",
+    actname: ["Albert_Augustus_Charles_58195837", "Victoria_Hanover_57192892"],
+    actdate: "1840-02-10",
+    category: "marriage",
+    datum: "Chapel Royal,St. James Palace,England",
+  },
+  {
+    _: "person",
+    person: "Edward_VII_Wettin_85157273",
+    parent: ["Albert_Augustus_Charles_58195837", "Victoria_Hanover_57192892"],
+  },
+  {
+    _: "person",
+    person: "Victoria_Adelaide_Mary_91581920",
+    parent: ["Albert_Augustus_Charles_58195837", "Victoria_Hanover_57192892"],
+  },
+];
+
+const recordsVK = [
+  {
+    _: "datum",
+    actdate: "2001-11-17T20:29:58",
+    actname: "you",
+    category: "vk",
+    datum: `
+                  Hello
+                  `,
+    sayname: "Private community",
+  },
+  {
+    _: "datum",
+    actdate: "2001-11-17T20:29:19",
+    actname: "you",
+    category: "vk",
+    datum:
+      `
+                  Message with attachments
+                  ` +
+      `
+                        3 attached messages
+                      ` +
+      `
+
+`,
+    sayname: "Private community",
+  },
+  {
+    _: "datum",
+    actdate: "2001-11-17T20:28:38",
+    actname: "Private community",
+    category: "vk",
+    datum: `
+                  Hello world
+                  `,
+    sayname: "you",
+  },
+];
+
+const recordsTG = [
+  {
+    _: "datum",
+    actdate: "2018-11-01T00:13:47",
+    actname: "Bob",
+    category: "tg",
+    datum: "Hello world",
+    sayname: "you",
+  },
+  {
+    _: "datum",
+    actdate: "2018-12-06T18:11:15",
+    actname: "Bob",
+    category: "tg",
+    datum: "Reply http://example.com ",
+    sayname: "you",
+  },
+  {
+    _: "datum",
+    actdate: "2018-12-06T18:11:15",
+    actname: "Bob",
+    category: "tg",
+    datum: "",
+    sayname: "you",
+  },
+];
+
 export default {
   record2001,
   record2002,
-  record2003Unedited,
-  record2003Edited,
-  recordAdded,
-  recordArray,
-  recordArrayAdded,
-  recordAddedArrayItem,
-  recordEditedArrayItem,
-  recordDeletedArrayItem,
-  recordEditedArrayItemObject,
-  recordArrayLiteral,
-  recordExport1Tag,
-  recordSchema,
-  record2001Filepath,
+  record2003,
   recordFile,
   recordFileListing,
+  recordsPedigree,
+  recordsVK,
+  recordsTG,
 };

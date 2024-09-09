@@ -13,6 +13,7 @@ import parseTG from "../src/import/tg.js";
 import parseFS from "../src/import/fs.js";
 import parseBiorg from "../src/import/biorg.js";
 import parseListing from "../src/import/listing.js";
+import parseGEDCOM from "../src/import/gedcom.js";
 
 // node polyfills for browser APIs
 // used in csvs_js.digestMessage for hashes
@@ -39,6 +40,22 @@ const outputStream = () =>
       console.log("Sink error:", err);
     },
   });
+
+function sortRecords(a, b) {
+  if (a._ !== b._) {
+    return a._.localeCompare(b._);
+  }
+
+  if (a[a._] === undefined) {
+    return 1;
+  }
+
+  if (b[b._] === undefined) {
+    return -1;
+  }
+
+  return a[a._].localeCompare(b[b._]);
+}
 
 describe("import csvs", () => {
   beforeEach(() => {
@@ -156,6 +173,22 @@ describe("import listing", () => {
       );
 
       expect(data).toStrictEqual(testCase.expected);
+    });
+  });
+});
+
+describe("import gedcom", () => {
+  beforeEach(() => {
+    data = [];
+  });
+
+  testCases().gedcom.forEach((testCase) => {
+    test(testCase.name, async () => {
+      await pipeline(await parseGEDCOM(testCase.initial), outputStream());
+
+      expect(data.sort(sortRecords)).toStrictEqual(
+        testCase.expected.sort(sortRecords),
+      );
     });
   });
 });

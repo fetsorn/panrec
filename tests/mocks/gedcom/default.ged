@@ -1,0 +1,74 @@
+0 HEAD
+1 GEDC
+2 VERS 7.0
+0 @I1@ INDI
+1 NAME Victoria  /Hanover/
+1 TITL Queen of England
+1 SEX F
+1 BIRT
+2 DATE 24 MAY 1819
+2 PLAC Kensington,Palace,London,England
+1 DEAT
+2 DATE 22 JAN 1901
+2 PLAC Osborne House,Isle of Wight,England
+1 BURI
+2 PLAC Royal Mausoleum,Frogmore,Berkshire,England
+1 REFN 1
+1 FAMS @F1@
+1 UID 57192892
+0 @I2@ INDI
+1 NAME Albert Augustus Charles//
+1 TITL Prince
+1 SEX M
+1 BIRT
+2 DATE 26 AUG 1819
+2 PLAC Schloss Rosenau,Near Coburg,Germany
+1 DEAT
+2 DATE 14 DEC 1861
+2 PLAC Windsor Castle,Berkshire,England
+1 BURI
+2 PLAC Royal Masoleum,Frogmore,Windsor,England
+1 FAMS @F1@
+1 UID 58195837
+0 @I3@ INDI
+1 NAME Victoria Adelaide Mary//
+1 TITL Princess Royal
+1 SEX F
+1 BIRT
+2 DATE 21 NOV 1840
+2 PLAC Buckingham,Palace,London,England
+1 CHR
+2 DATE 10 FEB 1841
+2 PLAC Throne Room,Buckingham Palac,England
+1 DEAT
+2 DATE 5 AUG 1901
+2 PLAC Friedrichshof,Near,Kronberg,Taunus
+1 BURI
+2 PLAC Friedenskirche,Potsdam
+1 FAMC @F1@
+1 UID 91581920
+0 @I4@ INDI
+1 NAME Edward_VII  /Wettin/
+1 TITL King of England
+1 SEX M
+1 BIRT
+2 DATE 9 NOV 1841
+2 PLAC Buckingham,Palace,London,England
+1 DEAT
+2 DATE 6 MAY 1910
+2 PLAC Buckingham,Palace,London,England
+1 BURI
+2 DATE 20 MAY 1910
+2 PLAC Windsor,Berkshire,England
+1 FAMC @F1@
+1 UID 85157273
+0 @F1@ FAM
+1 HUSB @I2@
+1 WIFE @I1@
+1 CHIL @I3@
+1 CHIL @I4@
+1 MARR
+2 DATE 10 FEB 1840
+2 PLAC Chapel Royal,St. James Palace,England
+1 UID 58192748
+0 TRLR

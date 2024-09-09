@@ -1,0 +1,67 @@
+{
+  "name": "Bob",
+  "type": "personal_chat",
+  "id": 1,
+  "messages": [
+    {
+      "id": 7702,
+      "type": "message",
+      "date": "2018-11-01T00:13:47",
+      "date_unixtime": "1541009627",
+      "from": "1",
+      "from_id": "user1",
+      "text": "Hello world",
+      "text_entities": [
+        {
+          "type": "plain",
+          "text": "Hello world"
+        }
+      ]
+    },
+    {
+      "id": 8032,
+      "type": "message",
+      "date": "2018-12-06T18:11:15",
+      "date_unixtime": "1544098275",
+      "from": "Me",
+      "from_id": "user2",
+      "text": [
+        "Reply",
+        {
+          "type": "link",
+          "text": "http://example.com"
+        },
+        ""
+      ],
+      "text_entities": [
+        {
+          "type": "plain",
+          "text": "Reply"
+        },
+        {
+          "type": "link",
+          "text": "http://example.com"
+        },
+        {
+          "type": "plain",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "id": 8033,
+      "type": "message",
+      "date": "2018-12-06T18:11:15",
+      "date_unixtime": "1544098275",
+      "from": "me",
+      "from_id": "user2",
+      "file": "(File not included. Change data exporting settings to download.)",
+      "file_name": "6 Dec 2018 at 14_59_12.mp3",
+      "media_type": "audio_file",
+      "mime_type": "audio/ogg",
+      "duration_seconds": 257,
+      "text": "",
+      "text_entities": []
+    }
+  ]
+}

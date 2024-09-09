@@ -33,12 +33,12 @@ async function addLFS({ fs: fsVirt, dir, filepath }) {
   });
 }
 
-export default function writeCSVS(targetPath, doYank) {
+export default async function writeCSVS(targetPath, doYank) {
   // create .csvs.csv in targetPath if there is none
   try {
-    fs.readFileSync(`${targetPath}/.csvs.csv`);
+    await fs.promises.readFile(`${targetPath}/.csvs.csv`);
   } catch {
-    fs.writeFileSync(`${targetPath}/.csvs.csv`, "csvs,0.0.2");
+    await fs.promises.writeFile(`${targetPath}/.csvs.csv`, "csvs,0.0.2");
   }
 
   async function readFile(filepath) {
@@ -89,7 +89,7 @@ export default function writeCSVS(targetPath, doYank) {
 
     // NOTE: this dance is supposed to guarantee that realpath is not invalid
     // a writeFile to realpath would make realpath invalid during writing
-    const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), "csvs-"));
+    const tmpdir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "csvs-"));
 
     const tmpPath = path.join(tmpdir, "tmp");
 

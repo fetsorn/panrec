@@ -1,8 +1,10 @@
 /* eslint-disable no-console */
-import { describe, beforeEach, expect, test } from "@jest/globals";
+import { describe, beforeEach, expect, test, jest } from "@jest/globals";
 import { TextEncoder, TextDecoder } from "util";
-import fs from "fs";
 import crypto from "crypto";
+import fs from "fs";
+import path from "path";
+import os from "os";
 import { pipeline } from "stream/promises";
 import { ReadableStream } from "node:stream/web";
 import { testCasesExport as testCases } from "./cases.js";
@@ -20,15 +22,46 @@ global.crypto = {
   randomUUID: crypto.randomUUID,
 };
 
+function sortContent(content) {
+  const lines = content.split("\n");
+
+  const sorted = lines.sort().join("\n");
+
+  return sorted;
+}
+
 describe("export csvs", () => {
   testCases().csvs.forEach((testCase) => {
     test(testCase.name, async () => {
-      await pipeline(
-        ReadableStream.from(testCase.initial),
-        await exportCSVS(testCase.initial),
+      const tmpdir = await fs.promises.mkdtemp(
+        path.join(os.tmpdir(), "csvs-nodejs-test"),
       );
 
-      expect([]).toStrictEqual(testCase.expected);
+      await fs.promises.cp(testCase.target, tmpdir, { recursive: true });
+
+      await pipeline(
+        ReadableStream.from(testCase.initial),
+        await exportCSVS(tmpdir),
+      );
+
+      const files = await fs.promises.readdir(tmpdir);
+      await Promise.all(
+        files
+          .filter((file) => file !== ".DS_Store")
+          .map(async (file) => {
+            const content = await fs.promises.readFile(
+              path.join(tmpdir, file),
+              "utf8",
+            );
+
+            const expected = await fs.promises.readFile(
+              path.join(testCase.expected, file),
+              "utf8",
+            );
+
+            expect(sortContent(content)).toStrictEqual(sortContent(expected));
+          }),
+      );
     });
   });
 });
@@ -36,12 +69,22 @@ describe("export csvs", () => {
 describe("export stdout", () => {
   testCases().stdout.forEach((testCase) => {
     test(testCase.name, async () => {
+      let output = "";
+
+      jest.spyOn(process.stdout, "write").mockImplementation((s) => {
+        output += s;
+      });
+
       await pipeline(
         ReadableStream.from(testCase.initial),
-        await exportStdout(testCase.initial),
+        await exportStdout(),
       );
 
-      expect([]).toStrictEqual(testCase.expected);
+      jest.clearAllMocks();
+
+      const expected = await fs.promises.readFile(testCase.expected, "utf8");
+
+      expect(output).toStrictEqual(expected);
     });
   });
 });
@@ -49,12 +92,22 @@ describe("export stdout", () => {
 describe("export biorg", () => {
   testCases().biorg.forEach((testCase) => {
     test(testCase.name, async () => {
+      let output = "";
+
+      jest.spyOn(process.stdout, "write").mockImplementation((s) => {
+        output += s;
+      });
+
       await pipeline(
         ReadableStream.from(testCase.initial),
-        await exportBiorg(testCase.initial),
+        await exportBiorg(),
       );
 
-      expect([]).toStrictEqual(testCase.expected);
+      jest.clearAllMocks();
+
+      const expected = await fs.promises.readFile(testCase.expected, "utf8");
+
+      expect(output).toStrictEqual(expected);
     });
   });
 });
@@ -62,12 +115,22 @@ describe("export biorg", () => {
 describe("export json", () => {
   testCases().json.forEach((testCase) => {
     test(testCase.name, async () => {
-      await pipeline(
-        ReadableStream.from(testCase.initial),
-        await exportJSON(testCase.initial),
+      const tmpdir = await fs.promises.mkdtemp(
+        path.join(os.tmpdir(), "csvs-nodejs-test"),
       );
 
-      expect([]).toStrictEqual(testCase.expected);
+      const output = path.join(tmpdir, testCase.target);
+
+      await pipeline(
+        ReadableStream.from(testCase.initial),
+        await exportJSON(output),
+      );
+
+      const content = await fs.promises.readFile(output, "utf8");
+
+      const expected = await fs.promises.readFile(testCase.expected, "utf8");
+
+      expect(sortContent(content)).toStrictEqual(sortContent(expected));
     });
   });
 });

@@ -6,7 +6,7 @@ export const testCasesImport = () => ({
   csvs: [
     {
       name: "default",
-      query: "?_=datum&actname=name1",
+      query: "?_=event&actname=name1",
       initial: mocks.datasetDefault,
       expected: [mocks.record2001],
     },
@@ -29,14 +29,14 @@ export const testCasesImport = () => ({
     {
       name: "default",
       initial: mocks.vkDefault,
-      expected: [],
+      expected: mocks.recordsVK,
     },
   ],
   tg: [
     {
       name: "default",
       initial: mocks.tgDefault,
-      expected: [],
+      expected: mocks.recordsTG,
     },
   ],
   fs: [
@@ -62,35 +62,44 @@ export const testCasesImport = () => ({
       expected: [mocks.recordFileListing],
     },
   ],
+  gedcom: [
+    {
+      name: "default",
+      initial: mocks.gedcomDefault,
+      expected: mocks.recordsPedigree,
+    },
+  ],
 });
 
 export const testCasesExport = () => ({
   csvs: [
     {
       name: "default",
-      initial: mocks.biorgDefault,
-      expected: [mocks.record2001],
+      target: mocks.datasetEmpty,
+      initial: [mocks.record2001, mocks.record2002, mocks.record2003],
+      expected: mocks.datasetDefault,
     },
   ],
   stdout: [
     {
       name: "default",
-      initial: mocks.biorgDefault,
-      expected: [mocks.record2001],
+      initial: [mocks.record2001],
+      expected: mocks.jsonStdoutDefault,
     },
   ],
   biorg: [
     {
       name: "default",
-      initial: mocks.biorgDefault,
-      expected: [mocks.record2001],
+      initial: [mocks.record2001],
+      expected: mocks.biorgDefault,
     },
   ],
   json: [
     {
       name: "default",
-      initial: mocks.biorgDefault,
-      expected: [mocks.record2001],
+      target: "output.json",
+      initial: [mocks.record2001],
+      expected: mocks.jsonStdoutDefault,
     },
   ],
 });

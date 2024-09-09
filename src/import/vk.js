@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import stream from "stream";
 import { URLSearchParams } from "node:url";
 import { parse } from "parse5";
@@ -8,93 +9,23 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js";
 
 dayjs.extend(customParseFormat);
 
-// async function record() {
-//   const index = await fs.promises.readFile(sourcePath, { encoding: "utf8" });
-
-//   const wrap = parse(index).childNodes[1].childNodes[2].childNodes[1];
-
-//   // const header = wrap.childNodes.filter((a) => a.nodeName === 'div')[0]
-//   const menu = wrap.childNodes
-//     .filter((a) => a.nodeName === "div")[1]
-//     .childNodes.filter((a) => a.nodeName === "div")[0];
-//   // const footer = wrap.childNodes.filter((a) => a.nodeName === 'div')[2]
-
-//   // four page blocs with item divs for each data category
-//   const pageBlocks = menu.childNodes.filter((a) => a.nodeName === "div");
-// }
-
-function parseSender(item) {
-  const a = item.childNodes[1].childNodes[1].childNodes[1].childNodes[1];
-
-  const path = a.attrs[0].value;
-
-  const id = path.slice(0, path.indexOf("/"));
-
-  const name = a.childNodes[0].value;
-
-  return [id, name];
+function isBody(item) {
+  return item.nodeName === "body";
 }
 
-function parseMessage(item) {
-  const message = item.childNodes[1].childNodes.filter(
-    (a) => a.nodeName === "div",
-  )[0];
-
-  const dataId = message.attrs[1].value;
-
-  const header = message.childNodes[1].childNodes.filter(
-    (a) => a.nodeName !== "a",
-  )[0].value;
-
-  const isOutcoming = /You, at/.test(header);
-
-  const dateString = header.slice(header.indexOf("at ") + 3);
-
-  const date = dayjs(dateString, "hh-mm-ss a on D MMM YYYY").format(
-    "YYYY-MM-DDTHH:mm:ss",
-  );
-
-  const text = message.childNodes[3].childNodes[0].value;
-
-  const kludges = message.childNodes[3].childNodes.filter(
-    (a) => a.nodeName === "div",
-  )[0];
-
-  const attachments = kludges
-    ? kludges.childNodes
-        .filter((a) => a.nodeName === "div")
-        .map((div) => {
-          const description = div.childNodes.filter(
-            (a) => a.nodeName === "div",
-          )[0].childNodes[0].value;
-
-          const link = div.childNodes.filter((a) => a.nodeName === "a")[0];
-
-          const href = link ? link.childNodes[0].value : "";
-
-          return `${description}\n${href}\n`;
-        })
-        .join("\n")
-    : "";
-
-  const content = `${text ?? ""}${attachments}`;
-
-  return {
-    dataId,
-    date,
-    isOutcoming,
-    content,
-  };
+function isText(item) {
+  return item.nodeName === "#text";
 }
 
-function messageRecord(query, name, message) {
-  const {
-    // dataId,
-    date,
-    isOutcoming,
-    content,
-  } = parseMessage(message);
+function isDiv(item) {
+  return item.nodeName === "div";
+}
 
+function isA(item) {
+  return item.nodeName === "a";
+}
+
+function buildRecord(query, name, date, isOutcoming, content) {
   const record = {
     _: "datum",
     datum: content,
@@ -127,44 +58,144 @@ function messageRecord(query, name, message) {
   return undefined;
 }
 
-async function messageFileRecords(query, name, messagesDir, messagesFile) {
-  const messagesPath = `${messagesDir}/${messagesFile}`;
+function parseAttachments(kludges) {
+  const attachments = kludges.childNodes.filter(isDiv);
 
-  const messagesContents = await fs.promises.readFile(messagesPath);
+  const descriptions = attachments.map((attachment) => {
+    const [attachmentDescription] = attachment.childNodes.filter(isDiv);
 
-  const iconv = new Iconv("CP1251", "UTF-8");
+    const [descriptionContent] =
+      attachmentDescription.childNodes.filter(isText);
 
-  const messagesHTML = iconv.convert(messagesContents).toString("utf8");
+    const description = descriptionContent.value;
 
-  const messages = parse(
-    messagesHTML,
-  ).childNodes[1].childNodes[2].childNodes[1].childNodes[3].childNodes[3].childNodes.filter(
-    (n) => n.nodeName === "div" && n.attrs[0].value !== "pagination clear_fix",
-  );
+    const [a] = attachment.childNodes.filter(isA);
 
-  return messages.map((message) => messageRecord(query, name, message));
+    const [label] = a ? a.childNodes : [];
+
+    const link = label ? label.value : "";
+
+    return `${description}\n${link}\n`;
+  });
+
+  return descriptions.join("\n");
 }
 
-async function senderRecords(sourcePath, query, sender) {
-  const [id, name] = parseSender(sender);
+function parseMessage(item) {
+  const [itemMain] = item.childNodes.filter(isDiv);
 
-  const messagesDir = `${sourcePath}/messages/${id}`;
+  const [message] = itemMain.childNodes.filter(isDiv);
 
-  const messagesFiles = await fs.promises.readdir(messagesDir);
+  // data-id="1234"
+  const [className, dataId] = message.attrs;
 
-  const records = await Promise.all(
-    messagesFiles
+  // 1234
+  const messageId = dataId.value;
+
+  const [header, messageBody] = message.childNodes.filter(isDiv);
+
+  const [headerContent] = header.childNodes.filter(isText);
+
+  const headerText = headerContent.value;
+
+  const isOutcoming = /You, at/.test(headerText);
+
+  const dateString = headerText.slice(headerText.indexOf("at ") + 3);
+
+  const date = dayjs(dateString, "hh-mm-ss a on D MMM YYYY").format(
+    "YYYY-MM-DDTHH:mm:ss",
+  );
+
+  const [messageContent] = messageBody.childNodes.filter(isText);
+
+  const messageText = messageContent ? messageContent.value : "";
+
+  const [kludges] = messageBody.childNodes.filter(isDiv);
+
+  const attachments = kludges ? parseAttachments(kludges) : "";
+
+  const content = `${messageText}${attachments}`;
+
+  return { date, isOutcoming, content };
+}
+
+async function parseMessageFile(query, name, messageFile) {
+  const iconv = new Iconv("CP1251", "UTF-8");
+
+  const messageContents = iconv
+    .convert(await fs.promises.readFile(messageFile))
+    .toString("utf8");
+
+  const document = parse(messageContents);
+
+  const [documentType, html] = document.childNodes;
+
+  const [body] = html.childNodes.filter(isBody);
+
+  const [wrap] = body.childNodes.filter(isDiv);
+
+  const [header, pageContent] = wrap.childNodes.filter(isDiv);
+
+  const [wrapPageContent] = pageContent.childNodes.filter(isDiv);
+
+  const items = wrapPageContent.childNodes
+    .filter(isDiv)
+    .filter((item) => item.attrs[0].value !== "pagination clear_fix");
+
+  return items.map(parseMessage);
+
+  return [];
+}
+
+async function parseMessages(sourcePath, query, id, name) {
+  const messageDir = path.join(sourcePath, "messages", id);
+
+  const messageFiles = await fs.promises.readdir(messageDir);
+
+  const messages = await Promise.all(
+    messageFiles
       .filter((f) => f !== ".DS_Store")
-      .map(async (messagesFile) =>
-        messageFileRecords(query, name, messagesDir, messagesFile),
+      .map(async (messageFile) =>
+        parseMessageFile(query, name, path.join(messageDir, messageFile)),
       ),
   );
 
-  return records.flat();
+  const records = messages
+    .flat()
+    .map(({ date, isOutcoming, content }) =>
+      buildRecord(query, name, date, isOutcoming, content),
+    );
+
+  return records;
+}
+
+function parseSender(item) {
+  const [itemMain] = item.childNodes.filter(isDiv);
+
+  const [messagePeer] = itemMain.childNodes.filter(isDiv);
+
+  const [messagePeerId] = messagePeer.childNodes.filter(isDiv);
+
+  const [a] = messagePeerId.childNodes.filter(isA);
+
+  const [label] = a.childNodes;
+
+  // <a href="">name</a>
+  const name = label.value;
+
+  const [href] = a.attrs;
+
+  // <a href="link"></a>
+  const link = href.value;
+
+  // 1/messages0.html -> 1
+  const id = link.slice(0, link.indexOf("/"));
+
+  return { id, name };
 }
 
 export default async function parseVK(sourcePath, query) {
-  const indexPath = `${sourcePath}/messages/index-messages.html`;
+  const indexPath = path.join(sourcePath, "messages", "index-messages.html");
 
   const iconv = new Iconv("CP1251", "UTF-8");
 
@@ -172,35 +203,31 @@ export default async function parseVK(sourcePath, query) {
     .convert(await fs.promises.readFile(indexPath))
     .toString("utf8");
 
-  const senders = parse(
-    index,
-  ).childNodes[1].childNodes[2].childNodes[1].childNodes[3].childNodes[1].childNodes[5].childNodes.filter(
-    (n) => n.nodeName === "div",
+  const document = parse(index);
+
+  const [documentType, html] = document.childNodes;
+
+  const [body] = html.childNodes.filter(isBody);
+
+  const [wrap] = body.childNodes.filter(isDiv);
+
+  const [header, pageContent, footer] = wrap.childNodes.filter(isDiv);
+
+  const [pageBlock] = pageContent.childNodes.filter(isDiv);
+
+  const [wrapPageContent] = pageBlock.childNodes.filter(isDiv);
+
+  const items = wrapPageContent.childNodes.filter(isDiv);
+
+  const senders = items.map(parseSender);
+
+  const records = await Promise.all(
+    senders.map(async ({ id, name }) =>
+      parseMessages(sourcePath, query, id, name),
+    ),
   );
 
-  const records = (
-    await Promise.all(
-      senders.map(async (sender) => senderRecords(sourcePath, query, sender)),
-    )
-  ).flat();
-
-  const toStream = new stream.Readable({
-    objectMode: true,
-
-    read() {
-      if (this.counter === undefined) {
-        this.counter = 0;
-      }
-
-      this.push(records[this.counter]);
-
-      if (this.counter === records.length - 1) {
-        this.push(null);
-      }
-
-      this.counter += 1;
-    },
-  });
+  const toStream = stream.Readable.from(records.flat());
 
   return toStream;
 }

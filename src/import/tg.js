@@ -83,23 +83,7 @@ export default async function parseTG(sourcePath, query) {
     .filter(Boolean)
     .flat();
 
-  const toStream = new stream.Readable({
-    objectMode: true,
-
-    read() {
-      if (this.counter === undefined) {
-        this.counter = 0;
-      }
-
-      this.push(records[this.counter]);
-
-      if (this.counter === records.length - 1) {
-        this.push(null);
-      }
-
-      this.counter += 1;
-    },
-  });
+  const toStream = stream.Readable.from(records);
 
   return toStream;
 }

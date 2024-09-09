@@ -22,7 +22,7 @@ export default function buildBiorg() {
 
     // eslint-disable-next-line no-unused-vars
     async write(entry, encoding, next) {
-      const entryNew = entry;
+      const entryNew = JSON.parse(JSON.stringify(entry));
 
       Object.keys(entry)
         .filter((key) => key !== entry._)
@@ -30,15 +30,15 @@ export default function buildBiorg() {
           entryNew[key] = objectToBiorgFormat(entry[key]);
         });
 
-      console.log("* .");
-      console.log(":PROPERTIES:");
-      Object.entries(entry)
-        .filter(([key]) => key !== entry._)
+      process.stdout.write("* .\n");
+      process.stdout.write(":PROPERTIES:\n");
+      Object.entries(entryNew)
+        .filter(([key]) => key !== entryNew._)
         .forEach(([key, value]) => {
-          console.log(`:${key}:`, value);
+          process.stdout.write(`:${key}: ${value}\n`);
         });
-      console.log(":END:");
-      console.log(entry[entry._]);
+      process.stdout.write(":END:\n");
+      process.stdout.write(`${entryNew[entryNew._]}\n`);
     },
 
     close() {},

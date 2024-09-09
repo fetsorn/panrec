@@ -14,6 +14,7 @@ function findpath(loadname) {
 export function loadMocks() {
   return {
     datasetDefault: findpath("csvs/default"),
+    datasetEmpty: findpath("csvs/empty"),
     jsonDefault: findpath("json/default.json"),
     jsonStdoutDefault: findpath("jsonStdout/default.txt"),
     vkDefault: findpath("vk/default"),
@@ -22,6 +23,7 @@ export function loadMocks() {
     biorgDefault: findpath("biorg/default.bi.org"),
     listingDefault: findpath("listing"),
     listingDefaultStdout: findpath("listing/default.txt"),
+    gedcomDefault: findpath("gedcom/default.ged"),
     ...records,
   };
 }

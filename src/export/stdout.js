@@ -1,11 +1,14 @@
 import { WritableStream } from "node:stream/web";
+import process from "process";
 
 export default function buildStdout() {
   return new WritableStream({
     objectMode: true,
 
     async write(entry) {
-      console.log(JSON.stringify(entry));
+      const json = JSON.stringify(entry);
+
+      process.stdout.write(`${json}\n`);
     },
 
     close() {},

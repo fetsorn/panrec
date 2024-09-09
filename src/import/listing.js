@@ -5,7 +5,6 @@ import stream from "stream";
 import { URLSearchParams } from "node:url";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
-import { digestMessage } from "@fetsorn/csvs-js";
 import crypto from "crypto";
 
 dayjs.extend(customParseFormat);
@@ -70,7 +69,6 @@ export default async function parseListing(sourcePath, query, doHashsum) {
     objectMode: true,
 
     async transform(chunk, encoding, callback) {
-      console.log(chunk);
       const content = (this.contentBuffer ?? "") + String(chunk);
 
       const lines = content.split("\n").filter((l) => l !== "");

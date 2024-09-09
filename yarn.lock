@@ -340,6 +340,11 @@
   resolved "https://registry.yarnpkg.com/@fetsorn/isogit-lfs/-/isogit-lfs-0.4.0.tgz#2c2c35bd67bae531a9ac350dfc033359ad8f6a93"
   integrity sha512-oxugJOnlbrSmLRXvunsF7ecxjo1pzjKLX2o5ua1Cx6xTjDf9CEowWTW3KttEJX5yh7wYPh6exGpr4zxnfqdgXQ==
 
+"@fetsorn/js-gedcom@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@fetsorn/js-gedcom/-/js-gedcom-0.0.1.tgz#5d8fbbbe5e69c525d45d60bd447ff3d8e0e26daf"
+  integrity sha512-WbAJRHE8qAhxDxpSmW9WX54SnEqXl7M+BXQZS90L7KNXddBFfme+qOeZYhxqW/bAfyuJtw7oX/2QmUP7T+J39w==
+
 "@humanwhocodes/config-array@^0.11.11":
   version "0.11.11"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.11.tgz#88a04c570dbbc7dd943e4712429c3df09bc32844"
