@@ -144,7 +144,9 @@ export default async function writeCSVS(targetPath, doYank) {
         }
       }
     },
+
     close() {},
+
     abort(err) {
       console.log("Sink error:", err);
     },

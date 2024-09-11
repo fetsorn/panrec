@@ -95,13 +95,20 @@ function renderMonth(month) {
 }
 
 function renderDate({ year, month, day }) {
-  const date = [year, renderMonth(month), day.toString().padStart(2, "0")].join(
-    "-",
-  );
+  const yearPartial = year ?? undefined;
+
+  const monthPartial = month ? renderMonth(month) : undefined;
+
+  const dayPartial = day ? day.toString().padStart(2, "0") : undefined;
+
+  const date = [yearPartial, monthPartial, dayPartial]
+    .filter(Boolean)
+    .join("-");
 
   return date;
 }
 
+// TODO add event uuid
 function buildBirth(person, indi) {
   const [birth] = indi.sub.get("https://gedcom.io/terms/v7/BIRT") ?? [];
 
@@ -112,9 +119,12 @@ function buildBirth(person, indi) {
 
     const [date] = birth.sub.get("https://gedcom.io/terms/v7/DATE") ?? [];
 
+    const uuid = crypto.randomUUID();
+
     const event = date
       ? {
           _: "event",
+          event: uuid,
           actname: person,
           actdate: renderDate(date.payload.date),
           category: "birth",
@@ -138,9 +148,12 @@ function buildDeath(person, indi) {
 
     const [date] = death.sub.get("https://gedcom.io/terms/v7/DATE") ?? [];
 
+    const uuid = crypto.randomUUID();
+
     const event = date
       ? {
           _: "event",
+          event: uuid,
           actname: person,
           actdate: renderDate(date.payload.date),
           category: "death",
@@ -167,8 +180,6 @@ function buildMarriage(family) {
 
   const [marriage] = family.sub.get("https://gedcom.io/terms/v7/MARR") ?? [];
 
-  console.log(marriage);
-
   if (marriage) {
     const [place] = marriage.sub.get("https://gedcom.io/terms/v7/PLAC") ?? [];
 
@@ -176,10 +187,13 @@ function buildMarriage(family) {
 
     const [date] = marriage.sub.get("https://gedcom.io/terms/v7/DATE") ?? [];
 
+    const uuid = crypto.randomUUID();
+
     const event =
       date && spouses
         ? {
             _: "event",
+            event: uuid,
             actname: spouses,
             actdate: renderDate(date.payload.date),
             category: "marriage",
@@ -251,11 +265,11 @@ export default async function parseGEDCOM(sourcePath) {
     "https://gedcom.io/terms/v7/record-INDI",
   );
 
-  const persons = individuals.map(buildPerson).flat();
+  const persons = individuals.map(buildPerson).flat().filter(Boolean);
 
   const families = ged7.records.get("https://gedcom.io/terms/v7/record-FAM");
 
-  const marriages = families.map(buildMarriage);
+  const marriages = families.map(buildMarriage).filter(Boolean);
 
   const records = [schemaRecord, ...cognates, ...persons, ...marriages];
 

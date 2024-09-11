@@ -7,6 +7,7 @@ import parseTG from "./tg.js";
 import parseFS from "./fs.js";
 import parseBiorg from "./biorg.js";
 import parseListing from "./listing.js";
+import parseGEDCOM from "./gedcom.js";
 
 async function isCSVS(sourcePath) {
   try {
@@ -72,6 +73,10 @@ async function isJSONStream() {
 
 async function isListing() {
   return true;
+}
+
+async function isGEDCOM(sourcePath) {
+  return /ged$/.test(sourcePath);
 }
 
 export function passthroughStream() {
@@ -157,6 +162,10 @@ export async function importStream(sourcePath, query, doHashsum, stats) {
 
   if (await isJSON(sourcePath)) {
     return parseJSON(sourcePath, query);
+  }
+
+  if (await isGEDCOM(sourcePath)) {
+    return parseGEDCOM(sourcePath);
   }
 
   return undefined;

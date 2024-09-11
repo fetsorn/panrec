@@ -104,45 +104,46 @@ async function csvsStats(sourcePath, query) {
 
   console.log(`records: ${records.length}`);
 
-  const size = await dirSize(`${sourcePath}/metadir`);
+  // TODO update to csvs 0.0.2
+  const size = await dirSize(sourcePath);
 
   console.log(`size: ${size} Kb`);
 
-  fs.readFile(`${sourcePath}/metadir.json`, "utf8", (err, data) => {
-    const jsonData = JSON.parse(data);
+  // fs.readFile(`${sourcePath}/metadir.json`, "utf8", (err, data) => {
+  //   const jsonData = JSON.parse(data);
 
-    const buildNestedObject = (jd, parentTrunk) => {
-      const result = {};
+  //   const buildNestedObject = (jd, parentTrunk) => {
+  //     const result = {};
 
-      Object.keys(jd).forEach((key) => {
-        if (jd[key].trunk === parentTrunk) {
-          result[key] = buildNestedObject(jd, key);
-        }
-      });
+  //     Object.keys(jd).forEach((key) => {
+  //       if (jd[key].trunk === parentTrunk) {
+  //         result[key] = buildNestedObject(jd, key);
+  //       }
+  //     });
 
-      return result;
-    };
+  //     return result;
+  //   };
 
-    const nestedObject = buildNestedObject(jsonData, "datum");
+  //   const nestedObject = buildNestedObject(jsonData, "datum");
 
-    const printTree = (obj, depth = 0) => {
-      const keys = Object.keys(obj);
+  //   const printTree = (obj, depth = 0) => {
+  //     const keys = Object.keys(obj);
 
-      if (depth === 0) {
-        console.log("datum");
-      }
+  //     if (depth === 0) {
+  //       console.log("datum");
+  //     }
 
-      keys.forEach((key) => {
-        const indent = "  ".repeat(depth + 1);
+  //     keys.forEach((key) => {
+  //       const indent = "  ".repeat(depth + 1);
 
-        console.log(`${indent}|- ${key}`);
+  //       console.log(`${indent}|- ${key}`);
 
-        printTree(obj[key], depth + 1);
-      });
-    };
+  //       printTree(obj[key], depth + 1);
+  //     });
+  //   };
 
-    printTree(nestedObject);
-  });
+  //   printTree(nestedObject);
+  // });
 
   const toStream = new stream.Readable({ objectMode: true });
 
@@ -152,7 +153,7 @@ async function csvsStats(sourcePath, query) {
 }
 
 export default async function readCSVS(sourcePath, query, stats) {
-  if (stats) return csvsStats(sourcePath);
+  if (stats) return csvsStats(sourcePath, query);
 
   const searchParams = new URLSearchParams(query);
 
