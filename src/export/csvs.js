@@ -89,22 +89,24 @@ export default async function writeCSVS(targetPath, doYank) {
 
     // NOTE: this dance is supposed to guarantee that realpath is not invalid
     // a writeFile to realpath would make realpath invalid during writing
-    const tmpdir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "csvs-"));
+    // const tmpdir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "csvs-"));
 
-    const tmpPath = path.join(tmpdir, "tmp");
+    // const tmpPath = path.join(tmpdir, "tmp");
 
-    await fs.promises.writeFile(tmpPath, content);
+    // await fs.promises.writeFile(tmpPath, content);
 
-    try {
-      await fs.promises.unlink(realpath);
-    } catch {
-      // if no file, do nothing
-    }
+    // try {
+    //   await fs.promises.unlink(realpath);
+    // } catch {
+    //   // if no file, do nothing
+    // }
 
-    // here realpath is valid again
-    await fs.promises.link(tmpPath, realpath);
+    // // here realpath is valid again
+    // await fs.promises.link(tmpPath, realpath);
 
-    await fs.promises.rm(tmpdir, { recursive: true });
+    // await fs.promises.rm(tmpdir, { recursive: true });
+
+    await fs.promises.writeFile(realpath, content);
   }
 
   const csvs = new CSVS({

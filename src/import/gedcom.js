@@ -119,6 +119,11 @@ function buildBirth(person, indi) {
 
     const [date] = birth.sub.get("https://gedcom.io/terms/v7/DATE") ?? [];
 
+    const datePartial =
+      date && date.payload.date
+        ? { actdate: renderDate(date.payload.date) }
+        : {};
+
     const uuid = crypto.randomUUID();
 
     const event = date
@@ -126,9 +131,9 @@ function buildBirth(person, indi) {
           _: "event",
           event: uuid,
           actname: person,
-          actdate: renderDate(date.payload.date),
           category: "birth",
           ...placePartial,
+          ...datePartial,
         }
       : undefined;
 
@@ -148,6 +153,11 @@ function buildDeath(person, indi) {
 
     const [date] = death.sub.get("https://gedcom.io/terms/v7/DATE") ?? [];
 
+    const datePartial =
+      date && date.payload.date
+        ? { actdate: renderDate(date.payload.date) }
+        : {};
+
     const uuid = crypto.randomUUID();
 
     const event = date
@@ -155,9 +165,9 @@ function buildDeath(person, indi) {
           _: "event",
           event: uuid,
           actname: person,
-          actdate: renderDate(date.payload.date),
           category: "death",
           ...placePartial,
+          ...datePartial,
         }
       : undefined;
 
@@ -187,6 +197,11 @@ function buildMarriage(family) {
 
     const [date] = marriage.sub.get("https://gedcom.io/terms/v7/DATE") ?? [];
 
+    const datePartial =
+      date && date.payload.date
+        ? { actdate: renderDate(date.payload.date) }
+        : {};
+
     const uuid = crypto.randomUUID();
 
     const event =
@@ -195,9 +210,9 @@ function buildMarriage(family) {
             _: "event",
             event: uuid,
             actname: spouses,
-            actdate: renderDate(date.payload.date),
             category: "marriage",
             ...placePartial,
+            ...datePartial,
           }
         : undefined;
 
@@ -236,30 +251,32 @@ export default async function parseGEDCOM(sourcePath) {
 
   const ged7 = G7Dataset.fromGEDC(gedc, g7v);
 
-  const schemaRecord = {
-    _: "_",
-    branch: ["cognate", "description_en", "description_ru", "task", "trunk"],
-    event: ["actdate", "actname", "category", "datum", "saydate", "sayname"],
-    person: "parent",
-  };
+  // expects this schema
+  // should not write to avoid destructive actions
+  // const schemaRecord = {
+  //   _: "_",
+  //   branch: ["cognate", "description_en", "description_ru", "task", "trunk"],
+  //   event: ["actdate", "actname", "category", "datum", "saydate", "sayname"],
+  //   person: "parent",
+  // };
 
-  const cognates = [
-    {
-      _: "branch",
-      branch: "actname",
-      cognate: "person",
-    },
-    {
-      _: "branch",
-      branch: "sayname",
-      cognate: "person",
-    },
-    {
-      _: "branch",
-      branch: "person",
-      cognate: "parent",
-    },
-  ];
+  // const cognates = [
+  //   {
+  //     _: "branch",
+  //     branch: "actname",
+  //     cognate: "person",
+  //   },
+  //   {
+  //     _: "branch",
+  //     branch: "sayname",
+  //     cognate: "person",
+  //   },
+  //   {
+  //     _: "branch",
+  //     branch: "person",
+  //     cognate: "parent",
+  //   },
+  // ];
 
   const individuals = ged7.records.get(
     "https://gedcom.io/terms/v7/record-INDI",
@@ -271,7 +288,7 @@ export default async function parseGEDCOM(sourcePath) {
 
   const marriages = families.map(buildMarriage).filter(Boolean);
 
-  const records = [schemaRecord, ...cognates, ...persons, ...marriages];
+  const records = [...persons, ...marriages];
 
   const toStream = stream.Readable.from(records);
 
