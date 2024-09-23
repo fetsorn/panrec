@@ -1,8 +1,5 @@
 #! /usr/bin/env node
 import { Command } from "commander";
-import stream from "stream";
-import { pipeline } from "stream/promises";
-import util from "util";
 import { packageJSON } from "./utils/index.js";
 import {
   importStream,
@@ -29,25 +26,30 @@ import exportStream from "./export/index.js";
     .action(async (options) => {
       const isStdin = process.stdin.isTTY === undefined;
 
-      try {
-        await pipeline([
-          isStdin
-            ? process.stdin
-            : await importStream(
-                options.sourcePath,
-                options.query,
-                options.hashsum,
-                options.stats,
-              ),
-          await exportStream(
-            options.targetPath,
-            options.targetType,
-            options.yank,
-          ),
-        ]);
-      } catch (e) {
-        console.error("pipeline error", e);
-      }
+      const input = isStdin
+        ? process.stdin
+        : await importStream(
+            options.sourcePath,
+            options.query,
+            options.hashsum,
+            options.stats,
+          );
+
+      const through = isStdin
+        ? await transformStream(
+            options.sourcePath,
+            options.query,
+            options.doHashsum,
+          )
+        : passthroughStream();
+
+      const output = await exportStream(
+        options.targetPath,
+        options.targetType,
+        options.yank,
+      );
+
+      await input.pipeThrough(through).pipeTo(output);
     });
 
   program.parse();

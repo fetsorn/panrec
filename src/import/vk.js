@@ -1,6 +1,6 @@
+import { ReadableStream } from "node:stream/web";
 import fs from "fs";
 import path from "path";
-import stream from "stream";
 import { URLSearchParams } from "node:url";
 import { parse } from "parse5";
 import { Iconv } from "iconv";
@@ -227,7 +227,7 @@ export default async function parseVK(sourcePath, query) {
     ),
   );
 
-  const toStream = stream.Readable.from(records.flat());
+  const toStream = ReadableStream.from(records.flat());
 
   return toStream;
 }

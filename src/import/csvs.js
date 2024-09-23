@@ -1,72 +1,79 @@
 import fs from "fs";
 import path from "path";
-import stream from "stream";
-import { spawn } from "child_process";
 import { URLSearchParams } from "node:url";
-import { CSVS } from "@fetsorn/csvs-js";
+import {
+  selectSchema,
+  selectRecord,
+  selectRecordStream,
+  toSchema,
+} from "@fetsorn/csvs-js";
 import { readdir, stat } from "fs/promises";
+import { ReadableStream } from "node:stream/web";
 
-// TODO: add WASM fallback
-async function grepCallback(contentFile, patternFile, isInverse) {
-  const contentFilePath = `/tmp/${crypto.randomUUID()}`;
+/**
+ * This returns an array of records from the dataset.
+ * @name searchParamsToQuery
+ * @export function
+ * @param {URLSearchParams} urlSearchParams - search params from a query string.
+ * @returns {Object}
+ */
+export function searchParamsToQuery(schema, searchParams) {
+  // TODO rewrite to schemaRecord
+  const urlSearchParams = new URLSearchParams(searchParams.toString());
 
-  const patternFilePath = `/tmp/${crypto.randomUUID()}`;
+  if (!urlSearchParams.has("_")) return {};
 
-  const outputFilePath = `/tmp/${crypto.randomUUID()}`;
+  const base = urlSearchParams.get("_");
 
-  await fs.promises.writeFile(contentFilePath, contentFile);
+  urlSearchParams.delete("_");
 
-  await fs.promises.writeFile(patternFilePath, patternFile);
+  urlSearchParams.delete("__");
 
-  const outputStream = fs.createWriteStream(outputFilePath);
+  const entries = Array.from(urlSearchParams.entries());
 
-  try {
-    await new Promise((res, rej) => {
-      const cmd = "/Users/fetsorn/.nix-profile/bin/rg";
+  // TODO: if key is leaf, add it to value of trunk
+  const query = entries.reduce(
+    (acc, [branch, value]) => {
+      // TODO: can handly only two levels of nesting, suffices for compatibility
+      // push to [trunk]: { [key]: [ value ] }
 
-      const flags = (isInverse ? ["-v"] : []).concat([
-        "-f",
-        patternFilePath,
-        contentFilePath,
-      ]);
+      const { trunk: trunk1 } = schema[branch];
 
-      const top = spawn(cmd, flags);
+      if (trunk1 === base || branch === base) {
+        return { ...acc, [branch]: value };
+      }
+      const { trunk: trunk2 } = schema[trunk1];
 
-      top.stdout.on("data", (data) => {
-        outputStream.write(data);
-      });
+      if (trunk2 === base) {
+        const trunk1Record = acc[trunk1] ?? { _: trunk1 };
 
-      top.stderr.on("data", (data) => {
-        rej(data.toString());
-      });
+        return { ...acc, [trunk1]: { ...trunk1Record, [branch]: value } };
+      }
+      const { trunk: trunk3 } = schema[trunk2];
 
-      top.on("close", () => {
-        res();
-      });
-    });
-  } catch (e) {
-    console.log(e);
-  }
+      if (trunk3 === base) {
+        const trunk2Record = acc[trunk2] ?? { _: trunk2 };
 
-  const output = await fs.promises.readFile(outputFilePath, {
-    encoding: "utf8",
-  });
+        const trunk1Record = trunk2Record[trunk1] ?? { _: trunk1 };
 
-  await fs.promises.unlink(contentFilePath);
+        return {
+          ...acc,
+          [trunk2]: {
+            ...trunk2Record,
+            [trunk1]: {
+              ...trunk1Record,
+              [branch]: value,
+            },
+          },
+        };
+      }
 
-  await fs.promises.unlink(patternFilePath);
+      return acc;
+    },
+    { _: base },
+  );
 
-  await fs.promises.unlink(outputFilePath);
-
-  return output;
-}
-
-async function fetchCallback(filepath) {
-  try {
-    return fs.promises.readFile(filepath, { encoding: "utf8" });
-  } catch {
-    throw ("couldn't find file", filepath);
-  }
+  return query;
 }
 
 const dirSize = async (dir) => {
@@ -92,15 +99,11 @@ const dirSize = async (dir) => {
 };
 
 async function csvsStats(sourcePath, query) {
-  const searchParams = new URLSearchParams(query);
-
-  const csvs = new CSVS({
-    readFile: async (filepath) =>
-      fetchCallback(path.join(sourcePath, filepath)),
-    grep: grepCallback,
+  const records = await selectRecord({
+    fs,
+    dir: sourcePath,
+    query,
   });
-
-  const records = await csvs.select(searchParams);
 
   console.log(`records: ${records.length}`);
 
@@ -145,55 +148,34 @@ async function csvsStats(sourcePath, query) {
   //   printTree(nestedObject);
   // });
 
-  const toStream = new stream.Readable({ objectMode: true });
-
-  toStream.push(null);
+  const toStream = ReadableStream.from([]);
 
   return toStream;
 }
 
-export default async function readCSVS(sourcePath, query, stats) {
-  if (stats) return csvsStats(sourcePath, query);
-
-  const searchParams = new URLSearchParams(query);
-
-  const csvs = new CSVS({
-    readFile: async (filepath) =>
-      fetchCallback(path.join(sourcePath, filepath)),
-    grep: grepCallback,
+export default async function readCSVS(sourcePath, searchParams, stats) {
+  const [schemaRecord] = await selectSchema({
+    fs,
+    dir: sourcePath,
   });
 
-  // if base is undefined, find first root
-  if (
-    searchParams.get("_") === null &&
-    (await csvs.detectVersion()) === "0.0.2"
-  ) {
-    // TODO this is specific to csvs 2, csvs 1 finds its own default base
-    const [schemaRecord] = await csvs.select(new URLSearchParams("_=_"));
+  const schema = toSchema(schemaRecord);
 
-    // { leaf: trunk, root: undefined }
-    const schema = Object.keys(schemaRecord)
-      .filter((key) => key !== "_")
-      .reduce(
-        (accTrunk, trunk) => ({
-          ...accTrunk,
-          ...schemaRecord[trunk].reduce(
-            (accLeaf, leaf) => ({ ...accLeaf, [leaf]: trunk }),
-            { [trunk]: undefined, ...accTrunk },
-          ),
-        }),
-        {},
-      );
+  const query = searchParamsToQuery(schema, searchParams);
 
-    // find first branch that has no trunk
-    const baseDefault = Object.keys(schema)
-      .filter((key) => key !== "branch")
-      .find((key) => schema[key] === undefined);
+  if (stats) return csvsStats(sourcePath, query);
 
-    searchParams.set("_", baseDefault);
-  }
+  const baseDefault = Object.keys(schema)
+    .filter((key) => key !== "branch")
+    .find((key) => schema[key] === undefined);
 
-  const queryStream = await csvs.selectStream(searchParams);
+  const base = query._ !== undefined ? query._ : baseDefault;
+
+  const queryStream = await selectRecordStream({
+    fs,
+    dir: sourcePath,
+    query: { _: base, ...query },
+  });
 
   return queryStream;
 }

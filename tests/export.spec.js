@@ -5,7 +5,6 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import os from "os";
-import { pipeline } from "stream/promises";
 import { ReadableStream } from "node:stream/web";
 import { testCasesExport as testCases } from "./cases.js";
 import exportCSVS from "../src/export/csvs.js";
@@ -39,12 +38,14 @@ describe("export csvs", () => {
 
       await fs.promises.cp(testCase.target, tmpdir, { recursive: true });
 
-      await pipeline(
-        ReadableStream.from(testCase.initial),
-        await exportCSVS(tmpdir),
-      );
+      const input = ReadableStream.from(testCase.initial);
+
+      const exportStream = await exportCSVS(tmpdir);
+
+      await input.pipeTo(exportStream);
 
       const files = await fs.promises.readdir(tmpdir);
+
       await Promise.all(
         files
           .filter((file) => file !== ".DS_Store")
@@ -75,10 +76,11 @@ describe("export stdout", () => {
         output += s;
       });
 
-      await pipeline(
-        ReadableStream.from(testCase.initial),
-        await exportStdout(),
-      );
+      const input = ReadableStream.from(testCase.initial);
+
+      const exportStream = await exportStdout();
+
+      await input.pipeTo(exportStream);
 
       jest.clearAllMocks();
 
@@ -98,10 +100,11 @@ describe("export biorg", () => {
         output += s;
       });
 
-      await pipeline(
-        ReadableStream.from(testCase.initial),
-        await exportBiorg(),
-      );
+      const input = ReadableStream.from(testCase.initial);
+
+      const exportStream = await exportBiorg();
+
+      await input.pipeTo(exportStream);
 
       jest.clearAllMocks();
 
@@ -121,10 +124,11 @@ describe("export json", () => {
 
       const output = path.join(tmpdir, testCase.target);
 
-      await pipeline(
-        ReadableStream.from(testCase.initial),
-        await exportJSON(output),
-      );
+      const input = ReadableStream.from(testCase.initial);
+
+      const exportStream = await exportJSON(output);
+
+      await input.pipeTo(exportStream);
 
       const content = await fs.promises.readFile(output, "utf8");
 

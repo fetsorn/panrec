@@ -1,7 +1,8 @@
 import fs from "fs";
 import path from "path";
-import stream from "stream";
-import crypto from "crypto";
+import { Duplex } from "node:stream";
+// import crypto from "crypto";
+import { ReadableStream } from "node:stream/web";
 import { URLSearchParams } from "node:url";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
@@ -43,11 +44,15 @@ async function statPath(
 
       if (doHashsum) {
         try {
-          const input = await fs.createReadStream(fileAbsolutePath);
+          const input = ReadableStream.from(
+            fs.createReadStream(fileAbsolutePath),
+          );
 
           const hash = crypto.createHash("sha256");
 
-          await stream.promises.pipeline(input, hash);
+          const { writable, readable } = Duplex.toWeb(hash);
+
+          await input.pipeTo(writable);
 
           const hashHex = hash.digest("hex");
 
@@ -83,23 +88,7 @@ export default async function parseFS(sourcePath, query, doHashsum) {
     await statPath(sourcePath, "", searchParams, doHashsum)
   ).flat();
 
-  const toStream = new stream.Readable({
-    objectMode: true,
-
-    read() {
-      if (this.counter === undefined) {
-        this.counter = 0;
-      }
-
-      this.push(records[this.counter]);
-
-      if (this.counter === records.length - 1) {
-        this.push(null);
-      }
-
-      this.counter += 1;
-    },
-  });
+  const toStream = ReadableStream.from(records);
 
   return toStream;
 }

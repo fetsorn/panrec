@@ -1,7 +1,8 @@
+import { ReadableStream, TransformStream } from "node:stream/web";
+import { Duplex } from "node:stream";
 import fs from "fs";
 import os from "os";
 import path from "path";
-import stream from "stream";
 import { URLSearchParams } from "node:url";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
@@ -26,11 +27,13 @@ async function parseLine(sourcePath, searchParams, filePath, doHashsum) {
   const fileAbsolutePath = path.join(sourcePath, filename);
 
   if (doHashsum) {
-    const input = await fs.createReadStream(fileAbsolutePath);
+    const input = ReadableStream.from(fs.createReadStream(fileAbsolutePath));
 
     const hash = crypto.createHash("sha256");
 
-    await stream.promises.pipeline(input, hash);
+    const { writable, readable } = Duplex.toWeb(hash);
+
+    await input.pipeTo(writable);
 
     const hashHex = hash.digest("hex");
 
@@ -65,10 +68,8 @@ async function parseLine(sourcePath, searchParams, filePath, doHashsum) {
 export default async function parseListing(sourcePath, query, doHashsum) {
   const searchParams = new URLSearchParams(query);
 
-  return new stream.Transform({
-    objectMode: true,
-
-    async transform(chunk, encoding, callback) {
+  return new TransformStream({
+    async transform(chunk, controller) {
       const content = (this.contentBuffer ?? "") + String(chunk);
 
       const lines = content.split("\n").filter((l) => l !== "");
@@ -86,14 +87,12 @@ export default async function parseListing(sourcePath, query, doHashsum) {
             doHashsum,
           );
 
-          this.push(record);
+          controller.enqueue(record);
         }),
       );
-
-      callback();
     },
 
-    async final(next) {
+    async flush(controller) {
       if (this.contentBuffer) {
         const record = await parseLine(
           sourcePath,
@@ -102,10 +101,8 @@ export default async function parseListing(sourcePath, query, doHashsum) {
           doHashsum,
         );
 
-        this.push(JSON.stringify(record, 2));
+        controller.enqueue(JSON.stringify(record, 2));
       }
-
-      next();
     },
   });
 }

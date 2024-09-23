@@ -1,5 +1,5 @@
+import { ReadableStream } from "node:stream/web";
 import fs from "fs";
-import stream from "stream";
 import {
   GEDCStruct,
   g7ConfGEDC,
@@ -290,7 +290,7 @@ export default async function parseGEDCOM(sourcePath) {
 
   const records = [...persons, ...marriages];
 
-  const toStream = stream.Readable.from(records);
+  const toStream = ReadableStream.from(records);
 
   return toStream;
 }

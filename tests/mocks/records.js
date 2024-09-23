@@ -44,7 +44,7 @@ const record2003 = {
 const recordFile = {
   _: "filepath",
   filepath: "index.txt",
-  moddate: "2024-09-09T00:56:34",
+  moddate: "2024-09-10T05:08:02",
   sourcepath: "/Volumes/mm/codes/csvs-nodejs/tests/mocks/fs/default",
 };
 
@@ -53,21 +53,22 @@ const recordFileListing = {
   filepath: "index.txt",
   filehash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   filesize: "0",
-  moddate: "2024-09-09T00:56:34",
+  moddate: "2024-09-10T05:08:02",
 };
 
 const recordsPedigree = [
-  {
-    _: "_",
-    branch: ["cognate", "description_en", "description_ru", "task", "trunk"],
-    event: ["actdate", "actname", "category", "datum", "saydate", "sayname"],
-    person: "parent",
-  },
-  { _: "branch", branch: "actname", cognate: "person" },
-  { _: "branch", branch: "sayname", cognate: "person" },
-  { _: "branch", branch: "person", cognate: "parent" },
+  // {
+  //   _: "_",
+  //   branch: ["cognate", "description_en", "description_ru", "task", "trunk"],
+  //   event: ["actdate", "actname", "category", "datum", "saydate", "sayname"],
+  //   person: "parent",
+  // },
+  // { _: "branch", branch: "actname", cognate: "person" },
+  // { _: "branch", branch: "sayname", cognate: "person" },
+  // { _: "branch", branch: "person", cognate: "parent" },
   {
     _: "event",
+    event: "1",
     actname: "Victoria_Hanover_57192892",
     actdate: "1819-05-24",
     category: "birth",
@@ -75,6 +76,7 @@ const recordsPedigree = [
   },
   {
     _: "event",
+    event: "2",
     actname: "Victoria_Hanover_57192892",
     actdate: "1901-01-22",
     category: "death",
@@ -82,6 +84,7 @@ const recordsPedigree = [
   },
   {
     _: "event",
+    event: "3",
     actname: "Albert_Augustus_Charles_58195837",
     actdate: "1819-08-26",
     category: "birth",
@@ -89,6 +92,7 @@ const recordsPedigree = [
   },
   {
     _: "event",
+    event: "4",
     actname: "Albert_Augustus_Charles_58195837",
     actdate: "1861-12-14",
     category: "death",
@@ -96,6 +100,7 @@ const recordsPedigree = [
   },
   {
     _: "event",
+    event: "5",
     actname: "Victoria_Adelaide_Mary_91581920",
     actdate: "1840-11-21",
     category: "birth",
@@ -103,6 +108,7 @@ const recordsPedigree = [
   },
   {
     _: "event",
+    event: "6",
     actname: "Victoria_Adelaide_Mary_91581920",
     actdate: "1901-08-05",
     category: "death",
@@ -110,6 +116,7 @@ const recordsPedigree = [
   },
   {
     _: "event",
+    event: "7",
     actname: "Edward_VII_Wettin_85157273",
     actdate: "1841-11-09",
     category: "birth",
@@ -117,6 +124,7 @@ const recordsPedigree = [
   },
   {
     _: "event",
+    event: "8",
     actname: "Edward_VII_Wettin_85157273",
     actdate: "1910-05-06",
     category: "death",
@@ -124,6 +132,7 @@ const recordsPedigree = [
   },
   {
     _: "event",
+    event: "9",
     actname: ["Albert_Augustus_Charles_58195837", "Victoria_Hanover_57192892"],
     actdate: "1840-02-10",
     category: "marriage",

@@ -1,5 +1,5 @@
-import stream from "stream";
 import org from "org-mode-parser";
+import { ReadableStream } from "node:stream/web";
 
 function tokenize(str) {
   return str
@@ -133,9 +133,7 @@ async function biorgStats(sourcePath) {
 
   printTree(records);
 
-  const toStream = new stream.Readable({ objectMode: true });
-
-  toStream.push(null);
+  const toStream = ReadableStream.from([]);
 
   return toStream;
 }
@@ -147,22 +145,7 @@ export default async function parseBiorg(sourcePath, query, stats) {
 
   const records = await parseOrgmode(sourcePath, false);
 
-  const toStream = new stream.Readable({
-    objectMode: true,
-    read() {
-      if (this.counter === undefined) {
-        this.counter = 0;
-      }
-
-      this.push(records[this.counter]);
-
-      if (this.counter === records.length - 1) {
-        this.push(null);
-      }
-
-      this.counter += 1;
-    },
-  });
+  const toStream = ReadableStream.from(records);
 
   return toStream;
 }

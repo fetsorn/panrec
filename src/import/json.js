@@ -1,5 +1,5 @@
+import { ReadableStream, TransformStream } from "node:stream/web";
 import fs from "fs";
-import stream from "stream";
 
 export async function parseJSON(sourcePath) {
   const index = await fs.promises.readFile(sourcePath);
@@ -7,16 +7,14 @@ export async function parseJSON(sourcePath) {
   // TODO filter query
   const records = JSON.parse(index);
 
-  const toStream = stream.Readable.from(records);
+  const toStream = ReadableStream.from(records);
 
   return toStream;
 }
 
 export async function parseJSONStream() {
-  return new stream.Transform({
-    objectMode: true,
-
-    async transform(chunk, encoding, callback) {
+  return new TransformStream({
+    async transform(chunk, controller) {
       const content = (this.contentBuffer ?? "") + String(chunk);
 
       const lines = content.split("\n").filter((l) => l !== "");
@@ -27,19 +25,15 @@ export async function parseJSONStream() {
 
       await Promise.all(
         lines.map(async (line) => {
-          this.push(JSON.parse(line));
+          controller.enqueue(JSON.parse(line));
         }),
       );
-
-      callback();
     },
 
-    async final(next) {
+    async flush(controller) {
       if (this.contentBuffer) {
-        this.push(JSON.parse(this.contentBuffer));
+        controller.enqueue(JSON.parse(this.contentBuffer));
       }
-
-      next();
     },
   });
 }

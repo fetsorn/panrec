@@ -1,5 +1,5 @@
+import { ReadableStream } from "node:stream/web";
 import fs from "fs";
-import stream from "stream";
 import { URLSearchParams } from "node:url";
 
 function parseMessage(query, partnerID, partnerName, message) {
@@ -83,7 +83,7 @@ export default async function parseTG(sourcePath, query) {
     .filter(Boolean)
     .flat();
 
-  const toStream = stream.Readable.from(records);
+  const toStream = ReadableStream.from(records);
 
   return toStream;
 }

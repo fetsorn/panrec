@@ -1,5 +1,4 @@
 import fs from "fs";
-import stream from "stream";
 import readCSVS from "./csvs.js";
 import { parseJSON, parseJSONStream } from "./json.js";
 import parseVK from "./vk.js";
@@ -10,14 +9,6 @@ import parseListing from "./listing.js";
 import parseGEDCOM from "./gedcom.js";
 
 async function isCSVS(sourcePath) {
-  try {
-    await fs.promises.readFile(`${sourcePath}/metadir.json`);
-
-    return true;
-  } catch {
-    //
-  }
-
   try {
     await fs.promises.readFile(`${sourcePath}/.csvs.csv`);
 
@@ -80,19 +71,9 @@ async function isGEDCOM(sourcePath) {
 }
 
 export function passthroughStream() {
-  return new stream.Transform({
-    objectMode: true,
-
-    async write(record, encoding, next) {
-      this.push(record);
-
-      next();
-    },
-
-    close() {},
-
-    abort(err) {
-      console.log("Sink error:", err);
+  return new TransformStream({
+    async write(record, controller) {
+      controller.enqueue(record);
     },
   });
 }
