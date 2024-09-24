@@ -1,36 +1,35 @@
 import fs from "fs";
-import os from "os";
 import path from "path";
-import { updateRecordStream } from "@fetsorn/csvs-js";
+import csvs from "@fetsorn/csvs-js";
 
-async function addLFS({ fs: fsVirt, dir, filepath }) {
-  const fileBlob = await fsVirt.promises.readFile(path.join(dir, filepath));
+// async function addLFS({ fs: fsVirt, dir, filepath }) {
+//   const fileBlob = await fsVirt.promises.readFile(path.join(dir, filepath));
 
-  const { buildPointerInfo, formatPointerInfo } = await import(
-    "@fetsorn/isogit-lfs"
-  );
+//   const { buildPointerInfo, formatPointerInfo } = await import(
+//     "@fetsorn/isogit-lfs"
+//   );
 
-  const pointerInfo = await buildPointerInfo(fileBlob);
+//   const pointerInfo = await buildPointerInfo(fileBlob);
 
-  // turn blob into pointer
-  const pointerBlob = formatPointerInfo(pointerInfo);
+//   // turn blob into pointer
+//   const pointerBlob = formatPointerInfo(pointerInfo);
 
-  const { writeBlob, updateIndex } = await import("isomorphic-git");
+//   const { writeBlob, updateIndex } = await import("isomorphic-git");
 
-  const pointerOID = await writeBlob({
-    fs: fsVirt,
-    dir,
-    blob: pointerBlob,
-  });
+//   const pointerOID = await writeBlob({
+//     fs: fsVirt,
+//     dir,
+//     blob: pointerBlob,
+//   });
 
-  await updateIndex({
-    fs: fsVirt,
-    dir,
-    filepath,
-    oid: pointerOID,
-    add: true,
-  });
-}
+//   await updateIndex({
+//     fs: fsVirt,
+//     dir,
+//     filepath,
+//     oid: pointerOID,
+//     add: true,
+//   });
+// }
 
 export default async function writeCSVS(targetPath, doYank) {
   // create .csvs.csv in targetPath if there is none
@@ -40,7 +39,7 @@ export default async function writeCSVS(targetPath, doYank) {
     await fs.promises.writeFile(`${targetPath}/.csvs.csv`, "csvs,0.0.2");
   }
 
-  return updateRecordStream({ fs, dir: targetPath });
+  return csvs.updateRecordStream({ fs, dir: targetPath });
 
   // TODO rewrite lfs to web stream or move to csvs-js
   // return new WritableStream({
