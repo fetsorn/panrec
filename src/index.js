@@ -27,7 +27,7 @@ import exportStream from "./export/index.js";
       const isStdin = process.stdin.isTTY === undefined;
 
       const input = isStdin
-        ? process.stdin
+        ? ReadableStream.from(process.stdin)
         : await importStream(
             options.sourcePath,
             options.query,

@@ -60,11 +60,9 @@ async function parseOrgmode(sourcePath) {
       nl.forEach((el) => {
         const record = {};
 
-        record._ = el.properties._;
-
         const valueBody = el.body.trim();
 
-        record[record._] = valueBody;
+        record[el.properties.__] = valueBody;
 
         Object.keys(el.properties).forEach((key) => {
           if (Object.prototype.hasOwnProperty.call(el.properties, key)) {

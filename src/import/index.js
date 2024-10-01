@@ -87,9 +87,9 @@ export async function transformStream(sourcePath, query, doHashsum) {
 
   // if source type is json
   // // pipe stdin stream to parseJson
-  // if (await isJSONStream(sourcePath)) {
-  //   return parseJSONStream(query);
-  // }
+  if (await isJSONStream(sourcePath)) {
+    return parseJSONStream(query);
+  }
 
   // if source type is csvs metadir stream
   // // pipe stdin stream to writeTmpMetadir
