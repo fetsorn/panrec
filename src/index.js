@@ -19,6 +19,7 @@ import exportStream from "./export/index.js";
     .option("-o, --target-path <string>", "Path to target")
     .option("--hashsum", "Hashsum files during caching", false)
     .option("--yank", "Yank files to target database", false)
+    .option("--insert", "Append tablets instead of updating", false)
     // TODO if targetPath is specified, targetType defaults to "csvs"
     .option("-t, --target-type <string>", "Type of target", "json")
     .option("-q, --query <string>", "Search string", "?")
@@ -39,7 +40,8 @@ import exportStream from "./export/index.js";
         ? await transformStream(
             options.sourcePath,
             options.query,
-            options.doHashsum,
+            options.hashsum,
+            options.stats,
           )
         : passthroughStream();
 
@@ -47,6 +49,7 @@ import exportStream from "./export/index.js";
         options.targetPath,
         options.targetType,
         options.yank,
+        options.insert,
       );
 
       await input.pipeThrough(through).pipeTo(output);

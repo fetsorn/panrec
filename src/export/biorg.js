@@ -18,27 +18,31 @@ export default function buildBiorg() {
   }
 
   return new WritableStream({
-    objectMode: true,
-
     // eslint-disable-next-line no-unused-vars
     async write(entry, encoding, next) {
       const entryNew = JSON.parse(JSON.stringify(entry));
 
       Object.keys(entry)
-        .filter((key) => key !== entry._)
+        .filter((key) => key !== entry.__)
         .forEach((key) => {
           entryNew[key] = objectToBiorgFormat(entry[key]);
         });
 
       process.stdout.write("* .\n");
+
       process.stdout.write(":PROPERTIES:\n");
+
       Object.entries(entryNew)
-        .filter(([key]) => key !== entryNew._)
+        .filter(([key]) => key !== entryNew.__)
         .forEach(([key, value]) => {
           process.stdout.write(`:${key}: ${value}\n`);
         });
+
       process.stdout.write(":END:\n");
-      process.stdout.write(`${entryNew[entryNew._]}\n`);
+
+      if (entryNew[entryNew.__] !== undefined) {
+        process.stdout.write(`${entryNew[entryNew.__]}\n`);
+      }
     },
 
     close() {},

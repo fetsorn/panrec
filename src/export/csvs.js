@@ -1,5 +1,4 @@
 import fs from "fs";
-import path from "path";
 import csvs from "@fetsorn/csvs-js";
 
 // async function addLFS({ fs: fsVirt, dir, filepath }) {
@@ -31,7 +30,7 @@ import csvs from "@fetsorn/csvs-js";
 //   });
 // }
 
-export default async function writeCSVS(targetPath, doYank) {
+export default async function writeCSVS(targetPath, doYank, doInsert) {
   // create .csvs.csv in targetPath if there is none
   try {
     await fs.promises.readFile(`${targetPath}/.csvs.csv`);
@@ -39,7 +38,9 @@ export default async function writeCSVS(targetPath, doYank) {
     await fs.promises.writeFile(`${targetPath}/.csvs.csv`, "csvs,0.0.2");
   }
 
-  return csvs.updateRecordStream({ fs, dir: targetPath });
+  return doInsert
+    ? csvs.insertRecordStream({ fs, dir: targetPath })
+    : csvs.updateRecordStream({ fs, dir: targetPath });
 
   // TODO rewrite lfs to web stream or move to csvs-js
   // return new WritableStream({

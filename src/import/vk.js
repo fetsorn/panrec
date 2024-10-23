@@ -1,4 +1,4 @@
-import { ReadableStream } from "node:stream/web";
+import { ReadableStream, TransformStream } from "node:stream/web";
 import fs from "fs";
 import path from "path";
 import { URLSearchParams } from "node:url";
@@ -25,22 +25,31 @@ function isA(item) {
   return item.nodeName === "a";
 }
 
-function buildRecord(query, name, date, isOutcoming, content) {
+function buildRecord(
+  query,
+  userId,
+  name,
+  date,
+  isOutcoming,
+  messageId,
+  content,
+) {
   const record = {
-    _: "datum",
+    _: "message",
+    message: `${userId}_${messageId}`,
     datum: content,
-    actdate: date,
-    category: "vk",
+    timestamp: date,
   };
 
-  const nameOutcoming = "you";
+  const subject = "you";
+  const contact = `${name}_${userId}`;
 
   if (isOutcoming) {
-    record.actname = nameOutcoming;
-    record.sayname = name;
+    record.sender = subject;
+    record.reader = contact;
   } else {
-    record.sayname = nameOutcoming;
-    record.actname = name;
+    record.sender = contact;
+    record.reader = subject;
   }
 
   const searchParams = new URLSearchParams(query);
@@ -116,7 +125,7 @@ function parseMessage(item) {
 
   const content = `${messageText}${attachments}`;
 
-  return { date, isOutcoming, content };
+  return { date, isOutcoming, content, messageId };
 }
 
 async function parseMessageFile(query, name, messageFile) {
@@ -143,27 +152,43 @@ async function parseMessageFile(query, name, messageFile) {
     .filter((item) => item.attrs[0].value !== "pagination clear_fix");
 
   return items.map(parseMessage);
-
-  return [];
 }
 
-async function parseMessages(sourcePath, query, id, name) {
-  const messageDir = path.join(sourcePath, "messages", id);
+async function parseMessages(sourcePath, query, userId, name) {
+  const messageDir = path.join(sourcePath, "messages", userId);
 
   const messageFiles = await fs.promises.readdir(messageDir);
 
-  const messages = await Promise.all(
-    messageFiles
-      .filter((f) => f !== ".DS_Store")
-      .map(async (messageFile) =>
-        parseMessageFile(query, name, path.join(messageDir, messageFile)),
-      ),
+  const messageStream = ReadableStream.from(
+    messageFiles.filter((f) => f !== ".DS_Store"),
   );
+
+  const parseStream = new TransformStream({
+    async transform(messageFile, controller) {
+      const messages = await parseMessageFile(
+        query,
+        name,
+        path.join(messageDir, messageFile),
+      );
+
+      messages.forEach((record) => controller.enqueue(record));
+    },
+  });
+
+  const messages = [];
+
+  const collectStream = new WritableStream({
+    write(message) {
+      messages.push(message);
+    },
+  });
+
+  await messageStream.pipeThrough(parseStream).pipeTo(collectStream);
 
   const records = messages
     .flat()
-    .map(({ date, isOutcoming, content }) =>
-      buildRecord(query, name, date, isOutcoming, content),
+    .map(({ date, isOutcoming, content, messageId }) =>
+      buildRecord(query, userId, name, date, isOutcoming, messageId, content),
     );
 
   return records;
@@ -189,9 +214,9 @@ function parseSender(item) {
   const link = href.value;
 
   // 1/messages0.html -> 1
-  const id = link.slice(0, link.indexOf("/"));
+  const userId = link.slice(0, link.indexOf("/"));
 
-  return { id, name };
+  return { userId, name };
 }
 
 export default async function parseVK(sourcePath, query) {
@@ -221,13 +246,17 @@ export default async function parseVK(sourcePath, query) {
 
   const senders = items.map(parseSender);
 
-  const records = await Promise.all(
-    senders.map(async ({ id, name }) =>
-      parseMessages(sourcePath, query, id, name),
-    ),
-  );
+  const senderStream = ReadableStream.from(senders);
 
-  const toStream = ReadableStream.from(records.flat());
+  const parseStream = new TransformStream({
+    async transform(sender, controller) {
+      const { userId, name } = sender;
 
-  return toStream;
+      const records = await parseMessages(sourcePath, query, userId, name);
+
+      records.forEach((record) => controller.enqueue(record));
+    },
+  });
+
+  return senderStream.pipeThrough(parseStream);
 }

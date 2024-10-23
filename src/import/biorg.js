@@ -62,21 +62,25 @@ async function parseOrgmode(sourcePath) {
 
         const valueBody = el.body.trim();
 
-        record[el.properties.__] = valueBody;
+        if (el.properties.__ !== undefined) {
+          record[el.properties.__] = valueBody.replace(/\n/g, "\\n");
+        }
 
-        Object.keys(el.properties).forEach((key) => {
-          if (Object.prototype.hasOwnProperty.call(el.properties, key)) {
-            const valueProperty = el.properties[key];
+        Object.keys(el.properties)
+          .filter((key) => key !== "__")
+          .forEach((key) => {
+            if (Object.prototype.hasOwnProperty.call(el.properties, key)) {
+              const valueProperty = el.properties[key];
 
-            if (valueProperty.startsWith("(:")) {
-              record[key] = convertToObject(
-                astFromArray(tokenize(valueProperty)),
-              );
-            } else {
-              record[key] = valueProperty;
+              if (valueProperty.startsWith("(:")) {
+                record[key] = convertToObject(
+                  astFromArray(tokenize(valueProperty)),
+                );
+              } else {
+                record[key] = valueProperty;
+              }
             }
-          }
-        });
+          });
 
         records.push(record);
       });

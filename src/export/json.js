@@ -3,8 +3,6 @@ import { WritableStream } from "node:stream/web";
 
 export default function buildJson(targetPath) {
   return new WritableStream({
-    objectMode: true,
-
     // eslint-disable-next-line no-unused-vars
     async write(entry, encoding, next) {
       // TODO: preserve json format after append

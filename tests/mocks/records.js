@@ -44,7 +44,7 @@ const record2003 = {
 const recordFile = {
   _: "filepath",
   filepath: "index.txt",
-  moddate: "2024-09-10T05:08:02",
+  moddate: "2024-09-10T02:08:02",
   sourcepath: "/Volumes/mm/codes/csvs-nodejs/tests/mocks/fs/default",
 };
 
@@ -53,7 +53,7 @@ const recordFileListing = {
   filepath: "index.txt",
   filehash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   filesize: "0",
-  moddate: "2024-09-10T05:08:02",
+  moddate: "2024-09-10T02:08:02",
 };
 
 const recordsPedigree = [
@@ -152,20 +152,17 @@ const recordsPedigree = [
 
 const recordsVK = [
   {
-    _: "datum",
-    actdate: "2001-11-17T20:29:58",
-    actname: "you",
-    category: "vk",
+    _: "message",
     datum: `
                   Hello
                   `,
-    sayname: "Private community",
+    message: "1_795791",
+    reader: "Private community_1",
+    sender: "you",
+    timestamp: "2001-11-17T20:29:58",
   },
   {
-    _: "datum",
-    actdate: "2001-11-17T20:29:19",
-    actname: "you",
-    category: "vk",
+    _: "message",
     datum:
       `
                   Message with attachments
@@ -176,17 +173,20 @@ const recordsVK = [
       `
 
 `,
-    sayname: "Private community",
+    message: "1_795789",
+    reader: "Private community_1",
+    sender: "you",
+    timestamp: "2001-11-17T20:29:19",
   },
   {
-    _: "datum",
-    actdate: "2001-11-17T20:28:38",
-    actname: "Private community",
-    category: "vk",
+    _: "message",
     datum: `
                   Hello world
                   `,
-    sayname: "you",
+    message: "1_795786",
+    reader: "you",
+    sender: "Private community_1",
+    timestamp: "2001-11-17T20:28:38",
   },
 ];
 
