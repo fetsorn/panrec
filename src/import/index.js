@@ -7,6 +7,7 @@ import parseFS from "./fs.js";
 import parseBiorg from "./biorg.js";
 import parseListing from "./listing.js";
 import parseGEDCOM from "./gedcom.js";
+import parseVCF from "./vcf.js";
 
 async function isCSVS(sourcePath) {
   try {
@@ -68,6 +69,10 @@ async function isListing() {
 
 async function isGEDCOM(sourcePath) {
   return /ged$/.test(sourcePath);
+}
+
+async function isVCF(sourcePath) {
+  return /vcf$/.test(sourcePath);
 }
 
 export function passthroughStream() {
@@ -147,6 +152,10 @@ export async function importStream(sourcePath, query, doHashsum, stats) {
 
   if (await isGEDCOM(sourcePath)) {
     return parseGEDCOM(sourcePath);
+  }
+
+  if (await isVCF(sourcePath)) {
+    return parseVCF(sourcePath);
   }
 
   return undefined;
