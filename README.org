@@ -3,7 +3,7 @@
 
 csvs-nodejs - read and write csvs database from command-line.
 
-[Docs](https://norcivilianlabs.org/panrec)
+[[https://norcivilianlabs.org/panrec][Docs]]
 
 * Developer Information and Tools
 ** Install dependencies
