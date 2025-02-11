@@ -348,10 +348,10 @@
   dependencies:
     levn "^0.4.1"
 
-"@fetsorn/csvs-js@^0.20.1":
-  version "0.20.1"
-  resolved "https://registry.yarnpkg.com/@fetsorn/csvs-js/-/csvs-js-0.20.1.tgz#abede86c1886062167c57fbaeef139cedabdcffd"
-  integrity sha512-TeoqszRcd4BdE5MzCUvWKJkRpcpzj8eteE3t3fVVGR00tDHyq0+NrivDwdY/07WdGzb5bBWaUvG2YSFlK+Bj9Q==
+"@fetsorn/csvs-js@^0.21.1":
+  version "0.21.1"
+  resolved "https://registry.yarnpkg.com/@fetsorn/csvs-js/-/csvs-js-0.21.1.tgz#22e36d261c2efdebcf933af1c7ae9d4a20e2eee0"
+  integrity sha512-BDoJ/J0H1RSzlywtVAJBMGHACrRjfIHDXtC2gC24XWzg5DTYwZxRo3cwtAENmhXm8NqSVVTMjSb1BjB03hFUBQ==
   dependencies:
     "@swimburger/isomorphic-streams" "^1.1.1"
     papaparse "^5.4.1"

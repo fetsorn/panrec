@@ -3,6 +3,8 @@
 
 csvs-nodejs - read and write csvs database from command-line.
 
+[Docs](https://norcivilianlabs.org/panrec)
+
 * Developer Information and Tools
 ** Install dependencies
 You'll need to install nodejs >= 18.15.0. We use yarn but npm should work too. Assuming that's done, run `yarn` with no args:

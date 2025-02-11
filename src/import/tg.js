@@ -56,6 +56,7 @@ function parseMessage(query, friendID, friendName, message) {
     timestamp: date,
   };
 
+  // TODO use proper id
   const personName = "fetsorn";
 
   const senderID = fromID ?? actorID;
@@ -87,6 +88,7 @@ export default async function parseTG(sourcePath, query) {
 
   const chats = index.id !== undefined ? [index] : index.chats.list;
 
+  // TODO add surname
   const records = chats
     .map(({ id: friendID, name: friendName, messages }) =>
       messages

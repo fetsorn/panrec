@@ -41,6 +41,7 @@ function buildRecord(
     timestamp: date,
   };
 
+  // TODO use proper id
   const subject = "you";
   const contact = `${name}_${userId}`;
 
