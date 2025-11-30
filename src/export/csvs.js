@@ -38,9 +38,13 @@ export default async function writeCSVS(targetPath, doYank, doInsert) {
     await fs.promises.writeFile(`${targetPath}/.csvs.csv`, "csvs,0.0.2");
   }
 
-  return doInsert
-    ? csvs.insertRecordStream({ fs, dir: targetPath })
-    : csvs.updateRecordStream({ fs, dir: targetPath });
+  return new WritableStream({
+    async write(entry) {
+      doInsert
+        ? await csvs.insertRecord({ fs, dir: targetPath, query: entry })
+        : await csvs.updateRecord({ fs, dir: targetPath, query: entry });
+    },
+  });
 
   // TODO rewrite lfs to web stream or move to csvs-js
   // return new WritableStream({
