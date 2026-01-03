@@ -1,0 +1,22 @@
+[package]
+name = "panrec"
+version = "0.0.1"
+edition = "2021"
+authors = [ "Anton Davydov <fetsorn@gmail.com>" ]
+
+[dev-dependencies]
+dir-diff = "0.3.3"
+assert-json-diff = "2.0.2"
+
+[dependencies]
+csvs = { path = "../csvs-rs" }
+async-stream = "0.3.6"
+backtrace = "0.3.74"
+clap = { version = "4.5.19", features = ["derive"] }
+crossterm = "0.28.1"
+futures-core = "0.3.31"
+futures-util = "0.3.31"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.145"
+temp-dir = { version = "0.1.16", git = "https://codeberg.org/fetsorn/temp-dir" }
+tokio = { version = "1.43.0", features = ["full"] }
