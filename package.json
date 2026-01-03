@@ -14,7 +14,7 @@
   "author": "fetsorn (Anton Davydov)",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "@fetsorn/csvs-js": "^0.23.0",
+    "@fetsorn/csvs-js": "../csvs-js",
     "@fetsorn/isogit-lfs": "^0.5.1",
     "@fetsorn/js-gedcom": "^0.0.1",
     "commander": "^12.1.0",

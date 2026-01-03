@@ -13,13 +13,16 @@ import exportStream from "./export/index.js";
 
   program
     .name(packageJSON.name)
-    .description("Manage csvs databases.")
+    .description("Manage csvs databases and other datasets.")
     .version(packageJSON.version, "-v, --version")
     .option("-i, --source-path <string>", "Path to source", process.cwd())
     .option("-o, --target-path <string>", "Path to target")
     .option("--hashsum", "Hashsum files during caching", false)
     .option("--yank", "Yank files to target database", false)
     .option("--insert", "Append tablets instead of updating", false)
+    .option("--delete", "Delete from tablets instead of updating", false)
+    .option("--create", "Create output", false)
+    .option("-l, --light", "Only search for matching base keys", false)
     // TODO if targetPath is specified, targetType defaults to "csvs"
     .option("-t, --target-type <string>", "Type of target", "json")
     .option("-q, --query <string>", "Search string", "?")
@@ -34,6 +37,7 @@ import exportStream from "./export/index.js";
             options.query,
             options.hashsum,
             options.stats,
+            options.light,
           );
 
       const through = isStdin
