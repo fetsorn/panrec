@@ -1,31 +1,3 @@
-#+title: csvs-nodejs
-#+OPTIONS: toc:nil
-
-csvs-nodejs - read and write csvs database from command-line.
-
-[[https://norcivilianlabs.org/panrec][Docs]]
-
-* Developer Information and Tools
-** Install dependencies
-You'll need to install nodejs >= 18.15.0. We use yarn but npm should work too. Assuming that's done, run `yarn` with no args:
-
-#+begin_src sh
-yarn
-#+end_src
-** Run with node
-
-#+begin_src sh
-node src/index.js
-#+end_src
-* Documentation
-** Structure of the repo
-[[src/index.js][index.js]] - main cli setup
-
-[[src/parse][parse]] - streams that parse various format into json entries
-
-[[src/build][build]] - streams that write json entries to various formats
-
-[[src/utils][utils]] - common utility code for streams
 * Usage
 #+begin_src txt
 Usage: csvs [options]
@@ -58,5 +30,3 @@ node src/index.js -i /path/to/source-database -o /path/to/target-database
 # cache file metadata from source folder to target database
 node src/index.js -i /path/to/source-folder -o /path/to/target-database
 #+end_src
-
-For the JavaScript implementation see [panrec-rs](https://codeberg.org/norcivilianlabs/panrec-rs/)

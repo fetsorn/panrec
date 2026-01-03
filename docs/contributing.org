@@ -1,0 +1,22 @@
+#+title: Contributing
+
+* Developer Information and Tools
+** Install dependencies
+You'll need to install nodejs >= 18.15.0. We use yarn but npm should work too. Assuming that's done, run `yarn` with no args:
+
+#+begin_src sh
+yarn
+#+end_src
+** Run with node
+
+#+begin_src sh
+node src/index.js
+#+end_src
+* Structure of the source code
+[[src/index.js][index.js]] - main cli setup
+
+[[src/import][import]] - streams that parse various format into json entries
+
+[[src/export][export]] - streams that write json entries to various formats
+
+[[src/utils][utils]] - common utility code for streams

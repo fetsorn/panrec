@@ -65,7 +65,7 @@ Panrec is in early development. You _will_ run into problems. When you do, here 
 
 [contribute]: docs/contributing.org
 [documentation]: https://norcivilianlabs.org/panrec
-[faq]: https://codeberg.org/norcivilianlabs/panrec-rs/src/branch/main/docs/faq.org
+[faq]: docs/faq.org
 [getting-started]: https://norcivilianlabs.org/panrec/getting_started.html
 
 [irc]: https://web.libera.chat/#qualifiedself
