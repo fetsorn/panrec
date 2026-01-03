@@ -58,3 +58,5 @@ node src/index.js -i /path/to/source-database -o /path/to/target-database
 # cache file metadata from source folder to target database
 node src/index.js -i /path/to/source-folder -o /path/to/target-database
 #+end_src
+
+For the JavaScript implementation see [panrec-rs](https://codeberg.org/norcivilianlabs/panrec-rs/)
