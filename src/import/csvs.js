@@ -153,15 +153,25 @@ export function searchParamsToQuery(schema, searchParams) {
   return query;
 }
 
-export default async function readCSVS(sourcePath, searchParams, stats, light) {
+export default async function readCSVS({
+  sourcePath,
+  searchParams,
+  stats,
+  light,
+  bare,
+}) {
   const schema = await csvs.buildSchema({
     fs,
     dir: sourcePath,
+    bare,
   });
 
-  const query = searchParamsToQuery(schema, searchParams);
+  // notify if the query is empty
+  if (searchParams === "?") {
+    throw new Error("please query with -q _=event");
+  }
 
-  // TODO notify if the query is empty
+  const query = searchParamsToQuery(schema, searchParams);
 
   const baseDefault = Object.keys(schema)
     .filter((key) => key !== "branch")
@@ -184,6 +194,7 @@ export default async function readCSVS(sourcePath, searchParams, stats, light) {
     fs,
     dir: sourcePath,
     light,
+    bare,
   });
 
   return queryStream.pipeThrough(recordStream);

@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { Duplex } from "node:stream";
-// import crypto from "crypto";
+import crypto from "crypto";
 import { ReadableStream } from "node:stream/web";
 import { URLSearchParams } from "node:url";
 import dayjs from "dayjs";

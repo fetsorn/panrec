@@ -13,10 +13,14 @@ async function isCSVS(sourcePath) {
   try {
     await fs.promises.readFile(`${sourcePath}/.csvs.csv`);
 
-    return true;
-  } catch {
-    //
-  }
+    return { bare: true, match: true };
+  } catch {}
+
+  try {
+    await fs.promises.readFile(`${sourcePath}/csvs/.csvs.csv`);
+
+    return { bare: false, match: true };
+  } catch {}
 
   return false;
 }
@@ -120,8 +124,10 @@ export async function transformStream(sourcePath, query, doHashsum) {
 export async function importStream(sourcePath, query, doHashsum, stats, light) {
   // if no stdin and no source path or source path is directory
   // // // detect source type is csvs
-  if (await isCSVS(sourcePath)) {
-    return readCSVS(sourcePath, query, stats, light);
+  const { bare, match } = await isCSVS(sourcePath);
+
+  if (match) {
+    return readCSVS({ sourcePath, searchParams: query, stats, light, bare });
   }
   // // // otherwise source type is fs
   // // // // return readFS stream on sourcePath

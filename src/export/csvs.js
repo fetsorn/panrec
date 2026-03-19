@@ -32,11 +32,11 @@ import csvs from "@fetsorn/csvs-js";
 
 export default async function writeCSVS(targetPath, doYank, doInsert) {
   // create .csvs.csv in targetPath if there is none
-  try {
-    await fs.promises.readFile(`${targetPath}/.csvs.csv`);
-  } catch {
-    await fs.promises.writeFile(`${targetPath}/.csvs.csv`, "csvs,0.0.2");
-  }
+  //try {
+  //  await fs.promises.readFile(`${targetPath}/.csvs.csv`);
+  //} catch {
+  //  await fs.promises.writeFile(`${targetPath}/.csvs.csv`, "csvs,0.0.2");
+  //}
 
   return new WritableStream({
     async write(entry) {

@@ -61,7 +61,11 @@ describe("import csvs", () => {
 
   testCases().csvs.forEach((testCase) => {
     test(testCase.name, async () => {
-      const importStream = await readCSVS(testCase.initial, testCase.query);
+      const importStream = await readCSVS({
+        sourcePath: testCase.initial,
+        searchParams: testCase.query,
+        bare: true,
+      });
 
       await importStream.pipeTo(outputStream());
 
