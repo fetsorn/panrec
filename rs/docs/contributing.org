@@ -1,0 +1,22 @@
+#+title: Contributing
+
+* Developer Information and Tools
+** Install dependencies
+You'll need to install Rust.
+
+#+begin_src sh
+yarn
+#+end_src
+** Run with cargo
+
+#+begin_src sh
+cargo run
+#+end_src
+* Structure of the source code
+[[src/main.rs][main.rs]] - main cli setup
+
+[[src/import][import]] - streams that parse various format into json entries
+
+[[src/export][export]] - streams that write json entries to various formats
+
+[[src/utils][utils]] - common utility code for streams
