@@ -28,8 +28,8 @@ import exportStream from "./export/index.js";
     .option("-q, --query <string>", "Search string", "?")
     .option("--stats", "Show database statistics", false)
     .action(async (options) => {
-      // Actually the most common Node CLI pattern is: default to file mode, require an explicit - or --stdin flag for stdin. That way scripts and
-      //pipes work predictably. The current logic is backwards — it assumes stdin unless proven otherwise.
+      // Actually the most common Node CLI pattern is: default to file mode, require an explicit - or --stdin flag for stdin.
+      // That way scripts and pipes work predictably.
       const isStdin = process.argv.includes("-");
 
       const input = isStdin
