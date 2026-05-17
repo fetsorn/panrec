@@ -194,6 +194,7 @@ export default async function readCSVS({
     fs,
     dir: sourcePath,
     light,
+    prose: true,
     bare,
   });
 
