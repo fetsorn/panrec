@@ -5,14 +5,14 @@ import fs from "fs";
 import crypto from "crypto";
 import { ReadableStream, WritableStream } from "node:stream/web";
 import { testCasesImport as testCases } from "./cases.js";
-import readCSVS from "../src/import/csvs.js";
-import { parseJSON, parseJSONStream } from "../src/import/json.js";
-import parseVK from "../src/import/vk.js";
-import parseTG from "../src/import/tg.js";
-import parseFS from "../src/import/fs.js";
-import parseBiorg from "../src/import/biorg.js";
-import parseListing from "../src/import/listing.js";
-import parseGEDCOM from "../src/import/gedcom.js";
+import readCSVS from "../js/src/import/csvs.js";
+import { parseJSON, parseJSONStream } from "../js/src/import/json.js";
+import parseVK from "../js/src/import/vk.js";
+import parseTG from "../js/src/import/tg.js";
+import parseFS from "../js/src/import/fs.js";
+import parseBiorg from "../js/src/import/biorg.js";
+import parseListing from "../js/src/import/listing.js";
+import parseGEDCOM from "../js/src/import/gedcom.js";
 
 let counter = 0;
 

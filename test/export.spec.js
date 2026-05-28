@@ -7,10 +7,10 @@ import path from "path";
 import os from "os";
 import { ReadableStream } from "node:stream/web";
 import { testCasesExport as testCases } from "./cases.js";
-import exportCSVS from "../src/export/csvs.js";
-import exportStdout from "../src/export/stdout.js";
-import exportBiorg from "../src/export/biorg.js";
-import exportJSON from "../src/export/json.js";
+import exportCSVS from "../js/src/export/csvs.js";
+import exportStdout from "../js/src/export/stdout.js";
+import exportBiorg from "../js/src/export/biorg.js";
+import exportJSON from "../js/src/export/json.js";
 
 // node polyfills for browser APIs
 // used in csvs_js.digestMessage for hashes
