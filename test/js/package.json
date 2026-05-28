@@ -1,0 +1,14 @@
+{
+  "name": "panrec-test-js",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "cucumber-js"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^11.0.0"
+  },
+  "dependencies": {
+    "@fetsorn/csvs-js": "^0.29.3"
+  }
+}
