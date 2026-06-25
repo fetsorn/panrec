@@ -30,6 +30,11 @@ Feature: Import records
     When I import from listing with query "?"
     Then the sorted output matches the expected records
 
+  Scenario: Import from csvs with stdin queries
+    Given the default csvs dataset for stdin queries
+    When I import from csvs with stdin queries
+    Then the output matches the expected records
+
   Scenario: Import from gedcom file
     Given the default gedcom file
     When I import from gedcom

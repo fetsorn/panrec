@@ -2,7 +2,7 @@ import { Given, When, Then } from "@cucumber/cucumber";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { ReadableStream, WritableStream } from "node:stream/web";
-import readCSVS from "../../../js/src/import/csvs.js";
+import { readCSVS, queryCSVS } from "../../../js/src/import/csvs.js";
 import { parseJSON, parseJSONStream } from "../../../js/src/import/json.js";
 import parseVK from "../../../js/src/import/vk.js";
 import parseBiorg from "../../../js/src/import/biorg.js";
@@ -30,6 +30,16 @@ Given("the default csvs dataset", function () {
   this.setupCryptoImport();
   this.fixture = this.mocks.datasetDefault;
   this.expected = [this.mocks.record2001];
+});
+
+Given("the default csvs dataset for stdin queries", function () {
+  this.setupCryptoImport();
+  this.fixture = this.mocks.datasetDefault;
+  this.stdinQueries = [
+    { _: "event", actname: "name1" },
+    { _: "event", actname: "name2" },
+  ];
+  this.expected = [this.mocks.record2001, this.mocks.record2002];
 });
 
 Given("the default json file", function () {
@@ -79,6 +89,13 @@ When("I import from csvs with query {string}", async function (query) {
     bare: true,
   });
   await importStream.pipeTo(outputStream(this.data));
+});
+
+When("I import from csvs with stdin queries", async function () {
+  this.data = [];
+  const input = ReadableStream.from(this.stdinQueries);
+  const select = await queryCSVS({ sourcePath: this.fixture, bare: true });
+  await input.pipeThrough(select).pipeTo(outputStream(this.data));
 });
 
 When("I import from json", async function () {
