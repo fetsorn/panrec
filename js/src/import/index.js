@@ -1,5 +1,5 @@
 import fs from "fs";
-import readCSVS from "./csvs.js";
+import { readCSVS, queryCSVS } from "./csvs.js";
 import { parseJSON, parseJSONStream } from "./json.js";
 import parseVK from "./vk.js";
 import parseTG from "./tg.js";
@@ -88,8 +88,18 @@ export function passthroughStream() {
 }
 
 export async function transformStream(sourcePath, query, doHashsum) {
-  // if stdin and source path
-  // // exception stdin source path
+  // if stdin and source path is csvs
+  // // parse JSON lines as queries, select against source
+  const csvsMeta = await isCSVS(sourcePath);
+
+  if (csvsMeta && csvsMeta.match) {
+    const parse = await parseJSONStream();
+    const select = await queryCSVS({ sourcePath, bare: csvsMeta.bare });
+
+    parse.readable.pipeTo(select.writable);
+
+    return { writable: parse.writable, readable: select.readable };
+  }
 
   // if source type is biorg
   // // pipe stdin stream to parseBiorg
@@ -99,10 +109,6 @@ export async function transformStream(sourcePath, query, doHashsum) {
   if (await isJSONStream(sourcePath)) {
     return parseJSONStream(query);
   }
-
-  // if source type is csvs metadir stream
-  // // pipe stdin stream to writeTmpMetadir
-  // // return queryStream on temporary metadir
 
   // if source type is filesystem listing
   // // pipe stdin stream to parseListing

@@ -153,7 +153,20 @@ export function searchParamsToQuery(schema, searchParams) {
   return query;
 }
 
-export default async function readCSVS({
+/**
+ * Returns a selectRecordStream TransformStream for the given CSVS source.
+ * Accepts query entries on writable side, emits matching records on readable side.
+ */
+export async function queryCSVS({ sourcePath, bare }) {
+  return csvs.selectRecordStream({
+    fs,
+    dir: sourcePath,
+    prose: true,
+    bare,
+  });
+}
+
+export async function readCSVS({
   sourcePath,
   searchParams,
   stats,
