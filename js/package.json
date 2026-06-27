@@ -1,6 +1,6 @@
 {
   "name": "panrec",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "Command-line client for csvs databases",
   "main": "src/index.js",
   "bin": "src/index.js",
@@ -14,7 +14,7 @@
   "author": "fetsorn (Anton Davydov)",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "@fetsorn/csvs-js": "^0.29.3",
+    "@fetsorn/csvs-js": "^0.29.7",
     "@fetsorn/js-gedcom": "^0.0.1",
     "commander": "^12.1.0",
     "dayjs": "^1.11.13",
