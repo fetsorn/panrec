@@ -24,7 +24,7 @@ import exportStream from "./export/index.js";
     .option("--create", "Create output", false)
     .option("-l, --light", "Only search for matching base keys", false)
     // TODO if targetPath is specified, targetType defaults to "csvs"
-    .option("-t, --target-type <string>", "Type of target", "json")
+    .option("-t, --target-type <string>", "Type of target")
     .option("-q, --query <string>", "Search string", "?")
     .option("--stats", "Show database statistics", false)
     .action(async (options) => {

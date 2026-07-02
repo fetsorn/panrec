@@ -6,39 +6,31 @@ import exportBiorg from "./biorg.js";
 import exportJson from "./json.js";
 
 export default function exportStream(targetPath, targetType, doYank, doInsert) {
-  // if target type is csvs or target path is directory
-  // // if target path not directory
-  // // // exception metadir no dir
-  // // pass entry to exportCSVS stream, return
-  const isCSVS =
-    targetPath !== undefined ||
-    targetType === "csvs" ||
-    (targetPath && fs.statSync(targetPath).isDirectory());
-
-  if (isCSVS) {
+  // explicit -t takes precedence
+  if (targetType === "csvs") {
     return exportCSVS(path.normalize(targetPath), doYank, doInsert);
   }
 
-  // TODO: unite with output stream
-  // if no target type or target type is json
-  // // pass json entry to exportJson
-  if (targetPath && targetType === "json") {
-    return exportJson(targetPath);
-  }
-  // if target type is biorg
-  // // pass json entry to exportBiorg stream
   if (targetType === "biorg") {
     return exportBiorg(targetPath);
   }
 
-  // if no target path
-  // // pass string chunk to exportStdout stream
+  if (targetType === "json" && targetPath) {
+    return exportJson(targetPath);
+  }
+
+  if (targetType === "json" && !targetPath) {
+    return exportStdout();
+  }
+
+  // no -t: auto-detect from path
   if (!targetPath) {
     return exportStdout();
   }
 
-  // if target path is file
-  // // pass string chunk to createWriteStream stream
-  // otherwise throw
+  if (fs.statSync(targetPath).isDirectory()) {
+    return exportCSVS(path.normalize(targetPath), doYank, doInsert);
+  }
+
   return fs.createWriteStream(path.normalize(targetPath));
 }
