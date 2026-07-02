@@ -154,6 +154,38 @@ export function searchParamsToQuery(schema, searchParams) {
 }
 
 /**
+ * Pick a default base branch when a query does not specify one.
+ *
+ * A "root" branch is never a leaf of another branch, i.e. its `trunks` list is
+ * empty. Among roots, the one with the most leaves is the most useful default
+ * base. Mirrors evenor's `pickDefaultBase`.
+ *
+ * The previous implementation looked for `schema[key] === undefined`, which
+ * matched the obsolete flat schema shape (root branches mapped to `undefined`).
+ * The current `csvs.buildSchema`/`toSchema` gives every branch a
+ * `{ trunks, leaves }` object, so that predicate never matched: the default
+ * base was always `undefined`, making an unspecified-base import silently
+ * return zero records.
+ *
+ * @param {Object} schema - schema as returned by csvs.buildSchema.
+ * @returns {string|undefined} default base branch, or undefined if none.
+ */
+export function pickDefaultBase(schema) {
+  const roots = Object.keys(schema).filter(
+    (branch) => branch !== "branch" && schema[branch].trunks.length === 0,
+  );
+
+  return roots.reduce(
+    (best, root) =>
+      best === undefined ||
+      schema[root].leaves.length > schema[best].leaves.length
+        ? root
+        : best,
+    undefined,
+  );
+}
+
+/**
  * Returns a selectRecordStream TransformStream for the given CSVS source.
  * Accepts query entries on writable side, emits matching records on readable side.
  */
@@ -186,9 +218,7 @@ export async function readCSVS({
 
   const query = searchParamsToQuery(schema, searchParams);
 
-  const baseDefault = Object.keys(schema)
-    .filter((key) => key !== "branch")
-    .find((key) => schema[key] === undefined);
+  const baseDefault = pickDefaultBase(schema);
 
   const base = query._ !== undefined ? query._ : baseDefault;
 
