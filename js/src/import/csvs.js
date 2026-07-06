@@ -106,6 +106,16 @@ export function searchParamsToQuery(schema, searchParams) {
   // TODO: if key is leaf, add it to value of trunk
   const query = entries.reduce(
     (acc, [branch, value]) => {
+      // `~` is the recursion operator, not a schema branch: pass it
+      // through to csvs as-is. Repeated `~` params become a list of
+      // traversals. Concise form only — stops (`.`) need a nested
+      // record, which a flat query string cannot express.
+      if (branch === "~") {
+        const specs = acc["~"] === undefined ? value : [acc["~"], value].flat();
+
+        return { ...acc, "~": specs };
+      }
+
       // TODO: can handly only two levels of nesting, suffices for compatibility
       // push to [trunk]: { [key]: [ value ] }
 
